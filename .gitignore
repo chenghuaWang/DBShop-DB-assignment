@@ -1,0 +1,4 @@
+data/
+src/core/__pycache__/
+src/GUI/__pycache__/
+src/__pycache__/
