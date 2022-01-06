@@ -12,7 +12,8 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtWidgets import QApplication, QDialog, QDialogButtonBox, QFormLayout, QLabel, QMainWindow, QMessageBox, QSpinBox, QWidget, qApp, QHeaderView, QInputDialog
 from PyQt5.QtCore import QObject, Qt
 from PyQt5.QtGui import QStandardItemModel, QStandardItem
-import API.StyleModel as StyleModel  # TODO delete this  line in release mode
+
+from GUI.API.Sql2Qt_Layer import LoginSqlAction
 
 class UI_MainWindow():
     def __init__(self, MainWindow, SqlConn):
@@ -108,9 +109,18 @@ class UI_MainWindow():
         ID, ok_id = QInputDialog.getText(self.Qw, 'ID Input Dialog', 'Enter your ID:')
         if ok_id:
             Pwd, ok_pwd = QInputDialog.getText(self.Qw, 'pwd Input Dialog', 'Enter your password:')
+        if ok_id and ok_pwd:
+            self.LoginWindowShow(ID, "User")
+        else:
+            pass
+    
+    def LoginWindow_TableViewChange(self, ID, TableName):
+        LoginSqlAction.GetUserTable(ID, TableName)
+        #TODO
+        pass
 
     # -- Table View Action Maker
-    def TableViewUpdate(self):
+    def TableViewUpdate(self, HeaderLabel, Data):
         # TODO
         # Reference: https://blog.csdn.net/jia666666/article/details/81624259
         # Reference button: https://blog.csdn.net/yy123xiang/article/details/78777964

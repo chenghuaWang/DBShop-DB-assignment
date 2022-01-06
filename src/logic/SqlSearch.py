@@ -3,6 +3,9 @@
 @file:      src/logic/SqlSearch.py
 """
 
+import logging
+logging.getLogger().setLevel(logging.INFO)
+
 class SqlSearch:
     @staticmethod
     def EX_S(SqlConn, rhs):
@@ -41,7 +44,10 @@ class SqlSearch:
         RO = RO.replace("#1", Entity_name)
         RO = RO.replace("#2", Table_name)
         cursor = SqlConn.conn.cursor()
-        cursor.excute(RO)
-        col = cursor.description
-        cursor.connection.commit()
+        try:
+            cursor.excute(RO)
+            col = cursor.description
+            cursor.connection.commit()
+        except:
+            logging.error("Wrong in get header title.")
         cursor.close()

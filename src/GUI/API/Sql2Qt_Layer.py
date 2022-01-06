@@ -14,3 +14,4 @@ class LoginSqlAction:
     def GetUserTable(SqlConn, Entity_name, Table_name):
         __data__ = SqlSearch.SelfDefined_S(SqlConn, Entity_name, Table_name)
         __describtion__ = SqlSearch.Get_Table_description(SqlConn, Entity_name, Table_name)
+        return __data__, __describtion__
