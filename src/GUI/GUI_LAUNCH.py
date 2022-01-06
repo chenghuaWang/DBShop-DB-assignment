@@ -13,7 +13,6 @@ from PyQt5.QtWidgets import QApplication, QMainWindow
 import API.StyleModel as StyleModel
 import GUI.API.main_window as main_window
 import GUI.API.StyleModel as StyleModel
-import logic.SqlSearch as SqlSearch
 
 from core.SqlMan import SqlMan
 from core.Phaser import PhaserLoginCfg
