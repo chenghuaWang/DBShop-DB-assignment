@@ -55,7 +55,7 @@ class TreeViewSqlAction:
     In this block, implement click event in TreeView.
     """
     @staticmethod
-    def main():
+    def main(MainWindow, QModelidx):
         pass
 
 

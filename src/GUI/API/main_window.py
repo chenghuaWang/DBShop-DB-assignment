@@ -173,7 +173,7 @@ class UI_MainWindow():
         txt += '名称:[{}]  信息:[{}]'.format(name, info)    
         self.statusbar.showMessage(txt)
 
-    # -- TreeView doubleclick Action
+    # -- TreeView clicked Action
     def TreeViewClickedAction(self, QModelidx):
         if QModelidx.row() == 0:
             table_name = "C"

@@ -27,7 +27,7 @@ class RUN:
         QtCore.QCoreApplication.setAttribute(QtCore.Qt.AA_EnableHighDpiScaling)
         # Qt Main app
         app = QApplication(sys.argv)
-        StyleModel.style_modeling(app, 'dark_blue.xml')
+        StyleModel.style_modeling(app, 'dark_lightgreen.xml')
         ui = main_window.UI_MainWindow(QMainWindow(), self.SqlConn)
         sys.exit(app.exec_())
 
