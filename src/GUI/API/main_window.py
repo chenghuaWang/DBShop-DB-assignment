@@ -15,6 +15,7 @@ from PyQt5.QtGui import QStandardItemModel, QStandardItem
 
 from GUI.API.Sql2Qt_Layer import LoginSqlAction
 from GUI.API.UserStatus import UserStatus_DS
+from GUI.API.TableSqlAction import TableSqlAction
 
 class UI_MainWindow():
     def __init__(self, MainWindow, SqlConn):
@@ -151,7 +152,7 @@ class UI_MainWindow():
         self.treeView.setStyle(QStyleFactory.create('windows'))
         self.treeView.selectionModel().currentChanged.connect(self.onCurrentChanged)
         # -- Add double click action
-        self.treeView.clicked.connect(self.TreeViewDoubleClickAction)
+        self.treeView.clicked.connect(self.TreeViewClickedAction)
 
     # -- TreeView Init Action
     def onCurrentChanged(self,current, previous):
@@ -170,7 +171,7 @@ class UI_MainWindow():
         self.statusbar.showMessage(txt)
 
     # -- TreeView doubleclick Action
-    def TreeViewDoubleClickAction(self, QModelidx):
+    def TreeViewClickedAction(self, QModelidx):
         if QModelidx.row() == 0:
             table_name = "C"
         elif QModelidx.row() == 1:
@@ -192,23 +193,6 @@ class UI_MainWindow():
         if ok_id and ok_pwd:
             if ID[0] in ['C', 'P', 'r']:
                 self.UserStatus.Update(ID[0], ID)
-            self.LoginWindow_TableViewChange(ID, self.UserStatus.UserTable())
+            LoginSqlAction.main(self, ID[0], ID)
     
-    def LoginWindow_TableViewChange(self, ID, TableName):
-        data, describe = LoginSqlAction.GetUserTable(self.SqlConn, ID, TableName)
-        self.TableViewUpdate(describe, data)
-
-    # -- Table View Action Maker
-    def TableViewUpdate(self, HeaderLabel, Data):
-        # TODO
-        # Reference: https://blog.csdn.net/jia666666/article/details/81624259
-        # Reference button: https://blog.csdn.net/yy123xiang/article/details/78777964
-        model=QStandardItemModel(Data.NumRow, Data.NumCol)
-        model.setHorizontalHeaderLabels(HeaderLabel)
-        for row in range(Data.NumRow):
-            for column in range(Data.NumCol):
-                item=QStandardItem("{a}".format(a=Data.GetSingleData(row, column)).encode('latin1').decode('gbk'))
-                model.setItem(row,column,item)
-        self.tableView.setModel(model)
-        self.tableView.horizontalHeader().setStretchLastSection(True)
-        self.tableView.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
+    

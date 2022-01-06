@@ -8,6 +8,9 @@ import sys
 sys.path.append(os.path.split(sys.path[0])[0])
 
 class UserStatus_DS:
+    """
+    Load table showed now.
+    """
     def __init__(self, User_mode, User_info):
         self.User_mode = User_mode
         self.User_info = User_info

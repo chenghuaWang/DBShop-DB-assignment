@@ -20,6 +20,30 @@ class SqlSearch:
         return SqlConn.EX(rhs)
 
     @staticmethod
+    def SelfDefind_S_direct(SqlConn, rhs):
+        """
+        Same as SelfDefind_S. But use Sql sentence directly.
+        """
+        return SqlConn.Search(rhs)
+
+    @staticmethod
+    def Get_Table_description_direct(SqlConn, rhs):
+        """
+        Same as Get_Table_description. But use Sql sentence directly.
+        """
+        cursor = SqlConn.conn.cursor()
+        try:
+            cursor.execute(rhs)
+            col = cursor.description
+            cursor.connection.commit()
+        except:
+            logging.error("Wrong in get header title.")
+        cursor.close()
+        if col is not None:
+            res = [item[0] for item in col]
+        return res
+
+    @staticmethod
     def SelfDefined_S(SqlConn, Entity_name, Table_name, judge_logic):
         """
         input:  [SqlMan-class] SqlConn
