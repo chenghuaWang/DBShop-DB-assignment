@@ -36,8 +36,10 @@ class SqlMan:
             password=self.pwd, database=self.database)
         if conn:
             logging.info("Connect success!")
+            self.Status = True
         else:
             logging.error("Sql connect failed.")
+            self.Status = False
         return conn
 
     def EX(self, rhs):

@@ -9,19 +9,26 @@ import sys
 sys.path.append(os.path.split(sys.path[0])[0])
 
 from PyQt5 import QtCore, QtGui, QtWidgets
-from PyQt5.QtWidgets import QApplication, QDialog, QDialogButtonBox, QFormLayout, QLabel, QMainWindow, QSpinBox, QWidget, qApp, QHeaderView, QInputDialog
+from PyQt5.QtWidgets import QApplication, QDialog, QDialogButtonBox, QFormLayout, QLabel, QMainWindow, QMessageBox, QSpinBox, QWidget, qApp, QHeaderView, QInputDialog
 from PyQt5.QtCore import QObject, Qt
 from PyQt5.QtGui import QStandardItemModel, QStandardItem
 import API.StyleModel as StyleModel  # TODO delete this  line in release mode
 
 class UI_MainWindow():
-    def __init__(self, MainWindow):
+    def __init__(self, MainWindow, SqlConn):
         self.MainWindow = MainWindow
+        self.SqlConn = SqlConn
+        self.Qw = QWidget()
         self.setupUi(self.MainWindow)
+        # -- UI Show
         self.MainWindow.show()
-
-    def Link_Sql_hook():
-        pass
+        # -- Check Sql Link is ok
+        if self.SqlConn.Status == True:
+            QMessageBox.information(self.Qw,'Sql Link status',
+                        'Sql Link Success',QMessageBox.Yes|QMessageBox.No,QMessageBox.Yes)
+        else:
+            QMessageBox.information(self.Qw,'Sql Link status',
+                        'Sql Link Error',QMessageBox.Yes|QMessageBox.No,QMessageBox.Yes)
 
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
@@ -98,10 +105,9 @@ class UI_MainWindow():
     # -- Login Window Action Maker
     def LoginWindowShow(self):
         # TODO
-        Qw = QWidget()
-        ID, ok_id = QInputDialog.getText(Qw, 'ID Input Dialog', 'Enter your ID:')
+        ID, ok_id = QInputDialog.getText(self.Qw, 'ID Input Dialog', 'Enter your ID:')
         if ok_id:
-            Pwd, ok_pwd = QInputDialog.getText(Qw, 'pwd Input Dialog', 'Enter your password:')
+            Pwd, ok_pwd = QInputDialog.getText(self.Qw, 'pwd Input Dialog', 'Enter your password:')
 
     # -- Table View Action Maker
     def TableViewUpdate(self):

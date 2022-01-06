@@ -29,7 +29,7 @@ class RUN:
         # Qt Main app
         app = QApplication(sys.argv)
         StyleModel.style_modeling(app, 'dark_blue.xml')
-        ui = main_window.UI_MainWindow(QMainWindow())
+        ui = main_window.UI_MainWindow(QMainWindow(), self.SqlConn)
         sys.exit(app.exec_())
 
 if __name__ == '__main__':
