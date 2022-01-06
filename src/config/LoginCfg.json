@@ -1,6 +1,6 @@
 {
     "User": [
-        {"NickName":"chenghua.wang","UserName":"sa","ServerName":"wang\\SQLEXPRESS","Host":"localhost","pwd":"123456","database":"Test", "port":"51091"},
+        {"NickName":"chenghua.wang","UserName":"sa","ServerName":"wang\\SQLEXPRESS","Host":"localhost","pwd":"123456","database":"Shop", "port":"51091"},
         {"NickName":"liuzheng.xin"}
     ],
     "Manager":[
