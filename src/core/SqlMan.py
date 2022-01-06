@@ -12,7 +12,7 @@ sys.path.append(os.path.split(sys.path[0])[0])
 import pymssql
 import logging
 
-import src.core.Check as Check
+import core.Check as Check
 
 logging.getLogger().setLevel(logging.WARN)
 
