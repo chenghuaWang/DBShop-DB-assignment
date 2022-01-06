@@ -1,0 +1,50 @@
+USE Shop;
+
+CREATE TABLE C(
+    CNo     VARCHAR(20)     PRIMARY KEY,
+    CName   VARCHAR(50)     NOT NULL,
+    CPhone  CHAR(11)        NOT NULL,
+    CAddr   VARCHAR(100)    NOT NULL,
+    GNo     VARCHAR(20)     NOT NULL,
+);
+
+CREATE TABLE S(
+    SNo     VARCHAR(20)     PRIMARY KEY,
+    SName   VARCHAR(50)     NOT NULL,
+    SKind   VARCHAR(20)     NOT NULL,
+    SPrice  FLOAT           CHECK(SPrice >= 0),
+    SInventory  INT         CHECK(SInventory >= 0)
+);
+
+CREATE TABLE G(
+    GNo     VARCHAR(20)     PRIMARY KEY,
+    CNo     VARCHAR(20)     NOT NULL,
+);
+
+CREATE TABLE D(
+    DNo     VARCHAR(20)     PRIMARY KEY,
+    CNo     VARCHAR(20)     NOT NULL,
+    DPay    FLOAT,
+    DPayable BIT,
+    DReturn BIT,
+    DReturnMoney FLOAT,
+);
+
+CREATE TABLE GS(
+    SNo     VARCHAR(20)     PRIMARY KEY,
+    GNo     VARCHAR(20)     NOT NULL,
+    GNum    INT             CHECK(GNum >= 0),
+);
+
+CREATE TABLE DS(
+    SNo     VARCHAR(20)     PRIMARY KEY,
+    DNo     VARCHAR(20)     NOT NULL,
+    SNum    INT             CHECK(SNum >= 0),
+);
+
+-- Add foreign key
+ALTER TABLE C ADD CONSTRAINT fk_C_gno FOREIGN KEY(GNo) REFERENCES G(GNo);
+ALTER TABLE G ADD CONSTRAINT fk_G_cno FOREIGN KEY(CNo) REFERENCES C(CNo);
+ALTER TABLE D ADD CONSTRAINT fk_D_cno FOREIGN KEY(CNo) REFERENCES C(CNo);
+ALTER TABLE GS ADD CONSTRAINT fk_GS_gno FOREIGN KEY(GNo) REFERENCES G(GNo);
+ALTER TABLE DS ADD CONSTRAINT fk_DS_dno FOREIGN KEY(DNo) REFERENCES D(DNo);
