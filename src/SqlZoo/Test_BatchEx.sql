@@ -1,5 +1,5 @@
-INSERT INTO student(idx, name) VALUES('12','Xinbao1');
-INSERT INTO student(idx, name) VALUES('14','Xinbao2');
-INSERT INTO student(idx, name) VALUES('24','Xinbao3');
-INSERT INTO student(idx, name) VALUES('32','Xinbao4');
-INSERT INTO student(idx, name) VALUES('62','Xinbao5');
+USE Shop;
+ALTER TABLE GS
+    ALTER COLUMN GNo CHAR(10) NOT NULL;
+ALTER TABLE GS ADD CONSTRAINT pk_GS_GNo PRIMARY KEY (GNo);
+ALTER TABLE GS ADD CONSTRAINT fk_GS_SNo FOREIGN KEY (SNo) REFERENCES S(SNo);

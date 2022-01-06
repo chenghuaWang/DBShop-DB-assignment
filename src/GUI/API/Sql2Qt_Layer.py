@@ -55,6 +55,11 @@ class TreeViewSqlAction:
     In this block, implement click event in TreeView.
     """
     @staticmethod
+    def main():
+        pass
+
+
+    @staticmethod
     def User_is_C(SqlConn, table_name, UserStatus):
         """
         Logic, When User is C. The Logic of TreeView.

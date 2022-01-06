@@ -146,6 +146,9 @@ class UI_MainWindow():
         item_child_GG = QStandardItem('GG')
         item_project.appendRow(item_child_GG)
         item_project.setChild(3, 1, QStandardItem('商户表'))
+        item_child_D = QStandardItem('D')
+        item_project.appendRow(item_child_D)
+        item_project.setChild(4, 1, QStandardItem('订单表'))
         # -- General set
         self.treeView.setModel(tree_model)
         self.treeView.expandAll()
@@ -180,6 +183,9 @@ class UI_MainWindow():
             table_name = "G"
         elif QModelidx.row() == 3:
             table_name = "GG"
+        elif QModelidx.row() == 4:
+            table_name = "D"
+        print(table_name)
 
     # -- Login Window Action Maker
     def LoginWindowShow(self):
@@ -194,5 +200,4 @@ class UI_MainWindow():
             if ID[0] in ['C', 'P', 'r']:
                 self.UserStatus.Update(ID[0], ID)
             LoginSqlAction.main(self, ID[0], ID)
-    
     
