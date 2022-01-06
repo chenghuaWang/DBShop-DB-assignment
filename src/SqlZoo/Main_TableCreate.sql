@@ -1,50 +1,61 @@
 USE Shop;
-
 CREATE TABLE C(
-    CNo     VARCHAR(20)     PRIMARY KEY,
-    CName   VARCHAR(50)     NOT NULL,
-    CPhone  CHAR(11)        NOT NULL,
-    CAddr   VARCHAR(100)    NOT NULL,
-    GNo     VARCHAR(20)     NOT NULL,
+    CNo     CHAR(10)    CHECK(CNo LIKE 'C[0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9]'),
+    CName   VARCHAR(10) NOT NULL,
+    CPhone  CHAR(12)    CHECK(CPhone LIKE '[0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9]'),
+    CAddr   VARCHAR(100)NOT NULL,
+    PRIMARY KEY (CNo),
 );
 
 CREATE TABLE S(
-    SNo     VARCHAR(20)     PRIMARY KEY,
-    SName   VARCHAR(50)     NOT NULL,
-    SKind   VARCHAR(20)     NOT NULL,
-    SPrice  FLOAT           CHECK(SPrice >= 0),
-    SInventory  INT         CHECK(SInventory >= 0)
+    SNo     CHAR(10)    CHECK(SNo LIKE 'S[0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9]'),
+    SName   VARCHAR(50) NOT NULL,
+    SKind   VARCHAR(30) NOT NULL,
+    SPrice  FLOAT       CHECK(SPrice >= 0),
+    SInventory  INT     CHECK(SInventory >= 0),
+    PRIMARY KEY (SNo),
 );
 
 CREATE TABLE G(
-    GNo     VARCHAR(20)     PRIMARY KEY,
-    CNo     VARCHAR(20)     NOT NULL,
+    GNo     CHAR(10)    CHECK(GNo LIKE 'G[0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9]'),
+    CNo     CHAR(10)    CHECK(CNo LIKE 'S[0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9]'),
+    PRIMARY KEY (GNo),
 );
 
 CREATE TABLE D(
-    DNo     VARCHAR(20)     PRIMARY KEY,
-    CNo     VARCHAR(20)     NOT NULL,
+    DNo     CHAR(10)    CHECK(DNo LIKE 'G[0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9]'),
+    CNo     CHAR(10)    CHECK(CNo LIKE 'S[0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9]'),
     DPay    FLOAT,
-    DPayable BIT,
-    DReturn BIT,
-    DReturnMoney FLOAT,
-);
+    DPay_yn BIT         NOT NULL,
+    DS_yn   BIT         NOT NULL,
+    DM_yn   FLOAT,
+    PRIMARY KEY (DNo),
+)
 
 CREATE TABLE GS(
-    SNo     VARCHAR(20)     PRIMARY KEY,
-    GNo     VARCHAR(20)     NOT NULL,
-    GNum    INT             CHECK(GNum >= 0),
-);
+    SNo     CHAR(10)    CHECK(SNo LIKE 'S[0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9]'),
+    GNo     CHAR(10)    CHECK(GNo LIKE 'G[0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9]'),
+    GSNum   INT,
+    PRIMARY KEY (SNo),
+)
 
 CREATE TABLE DS(
-    SNo     VARCHAR(20)     PRIMARY KEY,
-    DNo     VARCHAR(20)     NOT NULL,
-    SNum    INT             CHECK(SNum >= 0),
+    SNo     CHAR(10)    CHECK(SNo LIKE 'S[0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9]'),
+    DNo     CHAR(10)    CHECK(DNo LIKE 'G[0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9]'),
+    DSNum   INT         CHECK(DSNum >= 0),
+    PRIMARY KEY (SNo),
+)
+
+CREATE TABLE GG(
+    GGNo    CHAR(10)    CHECK(GGNo LIKE 'P[0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9]'),
+    SNo     CHAR(10)    CHECK(SNo LIKE 'G[0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9]'),
+    GGName  VARCHAR(50) NOT NULL,
+    GGAddr  VARCHAR(100)NOT NULL, 
+    PRIMARY KEY (GGNo),
 );
 
--- Add foreign key
-ALTER TABLE C ADD CONSTRAINT fk_C_gno FOREIGN KEY(GNo) REFERENCES G(GNo);
-ALTER TABLE G ADD CONSTRAINT fk_G_cno FOREIGN KEY(CNo) REFERENCES C(CNo);
-ALTER TABLE D ADD CONSTRAINT fk_D_cno FOREIGN KEY(CNo) REFERENCES C(CNo);
-ALTER TABLE GS ADD CONSTRAINT fk_GS_gno FOREIGN KEY(GNo) REFERENCES G(GNo);
-ALTER TABLE DS ADD CONSTRAINT fk_DS_dno FOREIGN KEY(DNo) REFERENCES D(DNo);
+ALTER TABLE G ADD CONSTRAINT fk_G_CNo FOREIGN KEY (CNo) REFERENCES C(CNo);
+ALTER TABLE D ADD CONSTRAINT fk_D_CNo FOREIGN KEY (CNo) REFERENCES C(CNo);
+ALTER TABLE GS ADD CONSTRAINT fk_GS_GNo FOREIGN KEY (GNo) REFERENCES G(GNo);
+ALTER TABLE DS ADD CONSTRAINT fk_DS_DNo FOREIGN KEY (DNo) REFERENCES D(DNo);
+ALTER TABLE GG ADD CONSTRAINT fk_GG_SNo FOREIGN KEY (SNo) REFERENCES S(SNo);

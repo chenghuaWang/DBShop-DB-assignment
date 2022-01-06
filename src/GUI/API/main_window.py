@@ -9,7 +9,7 @@ import sys
 sys.path.append(os.path.split(sys.path[0])[0])
 
 from PyQt5 import QtCore, QtGui, QtWidgets
-from PyQt5.QtWidgets import QApplication, QDialog, QDialogButtonBox, QFormLayout, QLabel, QMainWindow, QMessageBox, QSpinBox, QWidget, qApp, QHeaderView, QInputDialog
+from PyQt5.QtWidgets import QStyleFactory, QDialogButtonBox, QFormLayout, QLabel, QMainWindow, QMessageBox, QSpinBox, QWidget, qApp, QHeaderView, QInputDialog
 from PyQt5.QtCore import QObject, Qt
 from PyQt5.QtGui import QStandardItemModel, QStandardItem
 
@@ -43,9 +43,12 @@ class UI_MainWindow():
         self.gridLayout.addWidget(self.lineEdit, 0, 0, 1, 1)
         self.horizontalLayout = QtWidgets.QHBoxLayout()
         self.horizontalLayout.setObjectName("horizontalLayout")
+        # -- TreeView
         self.treeView = QtWidgets.QTreeView(self.centralwidget)
         self.treeView.setObjectName("treeView")
         self.horizontalLayout.addWidget(self.treeView, 0, QtCore.Qt.AlignHCenter)
+        self.TreeViewInit(MainWindow)
+        # -- TreeView
         self.tableView = QtWidgets.QTableView(self.centralwidget)
         self.tableView.setObjectName("tableView")
         self.horizontalLayout.addWidget(self.tableView)
@@ -102,6 +105,51 @@ class UI_MainWindow():
         self.actionLogin.setShortcut(_translate("MainWindow", "Ctrl+L"))
         self.actionLogin.setStatusTip(_translate("MainWindow", "Login. User or root-Manager"))
         self.actionLogin.triggered.connect(lambda: self.LoginWindowShow())
+    
+    # -- TreeView
+    def TreeViewInit(self, MainWindow):
+        # -- Add head info
+        tree_model = QStandardItemModel(MainWindow)
+        tree_model.setHorizontalHeaderLabels(['数据库', '信息说明'])
+        # -- Add Item
+        item_project = QStandardItem('Shop')
+        tree_model.appendRow(item_project)
+        tree_model.setItem(0, 1, QStandardItem('商品数据库'))
+        # -- Add Item in item_project
+        item_child_C = QStandardItem('C')
+        item_project.appendRow(item_child_C)
+        item_project.setChild(0, 1, QStandardItem('客户信息'))
+        item_child_S = QStandardItem('S')
+        item_project.appendRow(item_child_S)
+        item_project.setChild(1, 1, QStandardItem('商品表'))
+        item_child_G = QStandardItem('G')
+        item_project.appendRow(item_child_G)
+        item_project.setChild(2, 1, QStandardItem('购物车表'))
+        item_child_GG = QStandardItem('GG')
+        item_project.appendRow(item_child_GG)
+        item_project.setChild(3, 1, QStandardItem('商户表'))
+        # -- General set
+        self.treeView.setModel(tree_model)
+        self.treeView.expandAll()
+        self.treeView.setStyle(QStyleFactory.create('windows'))
+        self.treeView.selectionModel().currentChanged.connect(self.onCurrentChanged)
+
+    # -- TreeView Action
+    def onCurrentChanged(self,current, previous):
+        txt = '父级:[{}] '.format(str(current.parent().data()))
+        txt += '当前选中:[(行{},列{})] '.format(current.row(), current.column())
+        name=''
+        info=''
+        if current.column() == 0:
+            name = str(current.data())
+            info = str(current.sibling(current.row(), 1).data())
+        else:
+            name = str(current.sibling(current.row(), 0).data())
+            info = str(current.data())
+        
+        txt += '名称:[{}]  信息:[{}]'.format(name, info)    
+        self.statusbar.showMessage(txt)
+
 
     # -- Login Window Action Maker
     def LoginWindowShow(self):
@@ -110,12 +158,13 @@ class UI_MainWindow():
         if ok_id:
             Pwd, ok_pwd = QInputDialog.getText(self.Qw, 'pwd Input Dialog', 'Enter your password:')
         if ok_id and ok_pwd:
-            self.LoginWindowShow(ID, "User")
+            # Create View first.
+            self.LoginWindow_TableViewChange(ID, "G")
         else:
             pass
     
     def LoginWindow_TableViewChange(self, ID, TableName):
-        LoginSqlAction.GetUserTable(ID, TableName)
+        data, describe = LoginSqlAction.GetUserTable(self.SqlConn, ID, TableName)
         #TODO
         pass
 

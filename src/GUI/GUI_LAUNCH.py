@@ -10,7 +10,7 @@ sys.path.append(os.path.split(sys.path[0])[0])
 from PyQt5 import QtCore
 from PyQt5.QtWidgets import QApplication, QMainWindow
 
-import API.StyleModel as StyleModel
+import GUI.API.StyleModel as StyleModel
 import GUI.API.main_window as main_window
 import GUI.API.StyleModel as StyleModel
 
@@ -31,5 +31,3 @@ class RUN:
         ui = main_window.UI_MainWindow(QMainWindow(), self.SqlConn)
         sys.exit(app.exec_())
 
-if __name__ == '__main__':
-    RUN()()
