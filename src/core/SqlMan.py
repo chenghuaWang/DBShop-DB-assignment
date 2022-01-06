@@ -13,6 +13,7 @@ import pymssql
 import logging
 
 import core.Check as Check
+import core.Phaser as coPh
 
 logging.getLogger().setLevel(logging.WARN)
 
@@ -113,6 +114,9 @@ class SqlSearch_DS:
             self.NumCol = 0
         else:
             self.NumCol = len(self.m_row[0])
+
+    def GetSingleData(self, i, j):
+        return self.m_row[i][j]
     
     def GetRow(self, idx=-1):
         """
@@ -127,7 +131,8 @@ class SqlSearch_DS:
             else:
                 return self.m_row[idx]
 
-    def print(self):
+    def Print(self):
+        print(self.NumRow, self.NumRow)
         if self.NumRow == 0:
             logging.warn("null. No data in search conce")
         else:

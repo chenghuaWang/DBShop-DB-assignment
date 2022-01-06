@@ -9,14 +9,16 @@ import sys
 sys.path.append(os.path.split(sys.path[0])[0])
 
 from PyQt5 import QtCore, QtGui, QtWidgets
-from PyQt5.QtWidgets import QStyleFactory, QDialogButtonBox, QFormLayout, QLabel, QMainWindow, QMessageBox, QSpinBox, QWidget, qApp, QHeaderView, QInputDialog
+from PyQt5.QtWidgets import QStyleFactory, QMessageBox, QSpinBox, QWidget, qApp, QHeaderView, QInputDialog
 from PyQt5.QtCore import QObject, Qt
 from PyQt5.QtGui import QStandardItemModel, QStandardItem
 
 from GUI.API.Sql2Qt_Layer import LoginSqlAction
+from GUI.API.UserStatus import UserStatus_DS
 
 class UI_MainWindow():
     def __init__(self, MainWindow, SqlConn):
+        self.UserStatus = UserStatus_DS("default", "default")
         self.MainWindow = MainWindow
         self.SqlConn = SqlConn
         self.Qw = QWidget()
@@ -57,11 +59,16 @@ class UI_MainWindow():
         self.menubar = QtWidgets.QMenuBar(MainWindow)
         self.menubar.setGeometry(QtCore.QRect(0, 0, 1429, 26))
         self.menubar.setObjectName("menubar")
+        # -- menu Bar
         self.menu = QtWidgets.QMenu(self.menubar)
         self.menu.setObjectName("menu")
         self.menu_2 = QtWidgets.QMenu(self.menubar)
         self.menu_2.setObjectName("menu_2")
+        self.menu_3 = QtWidgets.QMenu(self.menubar)
+        self.menu_3.setObjectName("menu_3")
         MainWindow.setMenuBar(self.menubar)
+        
+        # -- Status Bar
         self.statusbar = QtWidgets.QStatusBar(MainWindow)
         self.statusbar.setObjectName("statusbar")
         MainWindow.setStatusBar(self.statusbar)
@@ -71,11 +78,16 @@ class UI_MainWindow():
         self.actionSearch.setObjectName("actionSearch")
         self.actionLogin = QtWidgets.QAction(MainWindow)
         self.actionLogin.setObjectName("actionLogin")
+        self.actionSort = QtWidgets.QAction(MainWindow)
+        self.actionSort.setObjectName("actionSort")
+        # -- menu action
         self.menu.addAction(self.actionQuit)
         self.menu.addAction(self.actionSearch)
         self.menu_2.addAction(self.actionLogin)
+        self.menu_3.addAction(self.actionSort)
         self.menubar.addAction(self.menu.menuAction())
         self.menubar.addAction(self.menu_2.menuAction())
+        self.menubar.addAction(self.menu_3.menuAction())
 
         self.retranslateUi(MainWindow)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
@@ -85,6 +97,7 @@ class UI_MainWindow():
         MainWindow.setWindowTitle(_translate("MainWindow", "MainWindow"))
         self.menu.setTitle(_translate("MainWindow", "&文件"))
         self.menu_2.setTitle(_translate("MainWindow", "账户管理"))
+        self.menu_3.setTitle(_translate("MainWindow", "工具栏"))
         # -- Quit.
         self.actionQuit.setText(_translate("MainWindow", "Quit"))
         self.actionQuit.setShortcut(_translate("MainWindow", "Ctrl+Q"))
@@ -105,6 +118,10 @@ class UI_MainWindow():
         self.actionLogin.setShortcut(_translate("MainWindow", "Ctrl+L"))
         self.actionLogin.setStatusTip(_translate("MainWindow", "Login. User or root-Manager"))
         self.actionLogin.triggered.connect(lambda: self.LoginWindowShow())
+        # -- Sort
+        self.actionSort.setText(_translate("MainWindow", "排序"))
+        self.actionLogin.setStatusTip(_translate("MainWindow", "sort in oreder"))
+
     
     # -- TreeView
     def TreeViewInit(self, MainWindow):
@@ -133,8 +150,10 @@ class UI_MainWindow():
         self.treeView.expandAll()
         self.treeView.setStyle(QStyleFactory.create('windows'))
         self.treeView.selectionModel().currentChanged.connect(self.onCurrentChanged)
+        # -- Add double click action
+        self.treeView.clicked.connect(self.TreeViewDoubleClickAction)
 
-    # -- TreeView Action
+    # -- TreeView Init Action
     def onCurrentChanged(self,current, previous):
         txt = '父级:[{}] '.format(str(current.parent().data()))
         txt += '当前选中:[(行{},列{})] '.format(current.row(), current.column())
@@ -150,34 +169,45 @@ class UI_MainWindow():
         txt += '名称:[{}]  信息:[{}]'.format(name, info)    
         self.statusbar.showMessage(txt)
 
+    # -- TreeView doubleclick Action
+    def TreeViewDoubleClickAction(self, QModelidx):
+        if QModelidx.row() == 0:
+            table_name = "C"
+        elif QModelidx.row() == 1:
+            table_name = "S"
+        elif QModelidx.row() == 2:
+            table_name = "G"
+        elif QModelidx.row() == 3:
+            table_name = "GG"
 
     # -- Login Window Action Maker
     def LoginWindowShow(self):
-        # TODO
+        ok_id = ok_pwd = False
         ID, ok_id = QInputDialog.getText(self.Qw, 'ID Input Dialog', 'Enter your ID:')
         if ok_id:
-            Pwd, ok_pwd = QInputDialog.getText(self.Qw, 'pwd Input Dialog', 'Enter your password:')
+            if ID[0] in ['C', 'P', 'r']:
+                Pwd, ok_pwd = QInputDialog.getText(self.Qw, 'pwd Input Dialog', 'Enter your password:')
+            else:
+                QMessageBox.information(self.Qw,'Error',"不存在用户{a}".format(a=ID),QMessageBox.Yes|QMessageBox.No,QMessageBox.Yes)
         if ok_id and ok_pwd:
-            # Create View first.
-            self.LoginWindow_TableViewChange(ID, "G")
-        else:
-            pass
+            if ID[0] in ['C', 'P', 'r']:
+                self.UserStatus.Update(ID[0], ID)
+            self.LoginWindow_TableViewChange(ID, self.UserStatus.UserTable())
     
     def LoginWindow_TableViewChange(self, ID, TableName):
         data, describe = LoginSqlAction.GetUserTable(self.SqlConn, ID, TableName)
-        #TODO
-        pass
+        self.TableViewUpdate(describe, data)
 
     # -- Table View Action Maker
     def TableViewUpdate(self, HeaderLabel, Data):
         # TODO
         # Reference: https://blog.csdn.net/jia666666/article/details/81624259
         # Reference button: https://blog.csdn.net/yy123xiang/article/details/78777964
-        model=QStandardItemModel(4,4)
-        model.setHorizontalHeaderLabels(['标题1','标题2','标题3','标题4'])
-        for row in range(4):
-            for column in range(4):
-                item=QStandardItem('row %s,column %s'%(row,column))
+        model=QStandardItemModel(Data.NumRow, Data.NumCol)
+        model.setHorizontalHeaderLabels(HeaderLabel)
+        for row in range(Data.NumRow):
+            for column in range(Data.NumCol):
+                item=QStandardItem("{a}".format(a=Data.GetSingleData(row, column)).encode('latin1').decode('gbk'))
                 model.setItem(row,column,item)
         self.tableView.setModel(model)
         self.tableView.horizontalHeader().setStretchLastSection(True)

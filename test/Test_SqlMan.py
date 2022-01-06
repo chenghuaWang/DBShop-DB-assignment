@@ -18,6 +18,8 @@ if __name__ == "__main__":
     assert DEBUG == True
     user_cfg = coPh.PhaserLoginCfg().GetUser(0)
     SMa = coSql.SqlMan(user_cfg)
+    SMa.EX("select * from C where CNo='C12345678'")
+    """
     if SMa.TableExists("student") == False:
         # ----------------- Test EX ----------------
         SMa.EX(r"create table student(idx char(16) primary key, name char(16) not null);") # IS OK
@@ -31,4 +33,6 @@ if __name__ == "__main__":
     babab = SMa.Search("select * from student;") # IS OK
     # print(babab.GetRow(-1))
     babab.print()
+    """
+    
     
