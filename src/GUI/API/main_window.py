@@ -13,15 +13,16 @@ from PyQt5.QtWidgets import QStyleFactory, QMessageBox, QMenu, QWidget, qApp, QI
 from PyQt5.QtCore import QObject, Qt
 from PyQt5.QtGui import QStandardItemModel, QStandardItem, QCursor
 
-from GUI.API.Sql2Qt_Layer import LoginSqlAction
+from GUI.API.Sql2Qt_Layer import LoginSqlAction, TreeViewSqlAction, MenuInsertSqlAction
 from GUI.API.UserStatus import UserStatus_DS
 from GUI.API.TableSqlAction import TableSqlAction
 from GUI.API.CurrentTableStatus import CurrentTableStatus
-from GUI.API.Sql2Qt_Layer import TreeViewSqlAction
 from GUI.API.SearchTable_window import SearchTable_Window
+from GUI.API.Inert_window import Insert_Window
 
 class UI_MainWindow():
     def __init__(self, MainWindow, SqlConn):
+        self.Insert_childWindow = Insert_Window(TableSqlAction, self)
         self.SearchTable_childWindow = SearchTable_Window()
         self.TableStatus = CurrentTableStatus("default")
         self.UserStatus = UserStatus_DS("default", "default")
@@ -126,6 +127,7 @@ class UI_MainWindow():
         self.actionInsert.setText(_translate("MainWindow", "插入"))
         self.actionInsert.setShortcut(_translate("MainWindow", "Ctrl+I"))
         self.actionInsert.setStatusTip(_translate("MainWindow", "Insert into Table"))
+        self.actionInsert.triggered.connect(lambda:MenuInsertSqlAction.main(self))
         # -- Login.
         r"""
         User should first login.

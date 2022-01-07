@@ -115,6 +115,17 @@ class SqlSearch_DS:
         else:
             self.NumCol = len(self.m_row[0])
 
+    def NumRow_f(self):
+        self.NumRow = len(self.m_row)
+        return len(self.m_row)
+
+    def NumCol_f(self):
+        if self.NumRow_f == 0:
+            self.NumCol = 0
+        else:
+            self.NumCol = len(self.m_row[0])
+        return self.NumCol
+
     def GetSingleData(self, i, j):
         return self.m_row[i][j]
     

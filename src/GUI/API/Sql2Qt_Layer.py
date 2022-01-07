@@ -182,3 +182,11 @@ class TreeViewSqlAction:
             description = SqlSearch.Get_Table_description_direct(MainWindow.SqlConn, SQL_Sentence)
             TableSqlAction.TableViewUpdate(MainWindow, description, data)
             MainWindow.TableStatus.Update(table_name, data, description)
+
+
+class MenuInsertSqlAction:
+    @staticmethod
+    def main(MainWindow):
+        MainWindow.Insert_childWindow.initData()
+        MainWindow.Insert_childWindow.show()
+
