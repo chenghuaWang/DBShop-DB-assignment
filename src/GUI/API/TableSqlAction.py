@@ -4,13 +4,16 @@
 @brief:     Table Action Logic. Independent.
 """
 import os
+from string import ascii_uppercase
 import sys
 sys.path.append(os.path.split(sys.path[0])[0])
 
 from PyQt5 import QtCore, QtGui, QtWidgets
-from PyQt5.QtWidgets import QStyleFactory, QMessageBox, QSpinBox, QWidget, qApp, QHeaderView, QInputDialog
+from PyQt5.QtWidgets import QHeaderView, QMessageBox, QMenu, QWidget, qApp, QInputDialog
 from PyQt5.QtCore import QObject, Qt
-from PyQt5.QtGui import QStandardItemModel, QStandardItem
+from PyQt5.QtGui import QStandardItemModel, QStandardItem, QCursor
+
+from logic.SqlDelete import SqlDelete
 
 class TableSqlAction:
     @staticmethod
@@ -33,5 +36,33 @@ class TableSqlAction:
         MainWindow.tableView.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
 
     @staticmethod
-    def TableViewRightClickMain(MainWindow):
+    def TableViewRightClick_deleteOne(MainWindow):
+        r"""
+        Delete function for "G"\"D" Table only.
+        """
         pass
+
+    @staticmethod
+    def TableViewRightClick_deleteMulti(MainWindow):
+        pass
+
+    @staticmethod
+    def TableViewRightClick_deleteAll(MainWindow):
+        pass
+
+    @staticmethod
+    def TableViewRightClick_insert(MainWindow):
+        """
+        Will open a Window reference to Whitch item this table have.
+        """
+        pass
+
+    @staticmethod
+    def TableRightMenuContent(MainWindow, qt_point):
+        qt_Modleidx = QtWidgets.QTableView.indexAt(MainWindow.tableView,qt_point)
+        print(qt_Modleidx.row())
+        MainWindow.tableView.contextMenu = QMenu(MainWindow.Qw)
+        MainWindow.actionDelete = MainWindow.tableView.contextMenu.addAction(r"删除一项")
+        MainWindow.tableView.contextMenu.popup(QCursor.pos())  # Position of menu
+        MainWindow.actionDelete.triggered.connect(lambda:TableSqlAction.TableViewRightClick_deleteOne(MainWindow))
+        MainWindow.tableView.contextMenu.show()

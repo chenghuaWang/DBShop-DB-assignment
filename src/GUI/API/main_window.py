@@ -11,9 +11,9 @@ from src.GUI.API.Sql2Qt_Layer import TreeViewSqlAction
 sys.path.append(os.path.split(sys.path[0])[0])
 
 from PyQt5 import QtCore, QtGui, QtWidgets
-from PyQt5.QtWidgets import QStyleFactory, QMessageBox, QSpinBox, QWidget, qApp, QHeaderView, QInputDialog
+from PyQt5.QtWidgets import QStyleFactory, QMessageBox, QMenu, QWidget, qApp, QInputDialog
 from PyQt5.QtCore import QObject, Qt
-from PyQt5.QtGui import QStandardItemModel, QStandardItem
+from PyQt5.QtGui import QStandardItemModel, QStandardItem, QCursor
 
 from GUI.API.Sql2Qt_Layer import LoginSqlAction
 from GUI.API.UserStatus import UserStatus_DS
@@ -55,9 +55,11 @@ class UI_MainWindow():
         self.treeView.setObjectName("treeView")
         self.horizontalLayout.addWidget(self.treeView, 0, QtCore.Qt.AlignHCenter)
         self.TreeViewInit(MainWindow)
-        # -- TreeView
+        # -- TableView
         self.tableView = QtWidgets.QTableView(self.centralwidget)
         self.tableView.setObjectName("tableView")
+        self.tableView.setContextMenuPolicy(Qt.CustomContextMenu)  # set right menu start.
+        self.tableView.customContextMenuRequested.connect(self.TableshowContextMenu)
         self.horizontalLayout.addWidget(self.tableView)
         self.gridLayout.addLayout(self.horizontalLayout, 1, 0, 1, 1)
         MainWindow.setCentralWidget(self.centralwidget)
@@ -194,3 +196,14 @@ class UI_MainWindow():
                 self.UserStatus.Update(ID[0], ID)
             LoginSqlAction.main(self, ID[0], ID)
     
+    def TableRightClick(self):
+        TableSqlAction.TableViewRightClickMain(self)
+
+    def TableLeftClick(self, QModelidx):
+        print(QModelidx.row())
+
+    def TableshowContextMenu(self, qt_point):
+        """
+        Create right click menu
+        """
+        TableSqlAction.TableRightMenuContent(self, qt_point)

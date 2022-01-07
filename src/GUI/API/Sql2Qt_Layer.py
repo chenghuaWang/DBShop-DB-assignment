@@ -82,8 +82,10 @@ class TreeViewSqlAction:
         table_name = TreeViewSqlAction.getTableName(QModelidx)
         if MainWindow.UserStatus.User_mode == "r":
             TreeViewSqlAction.User_is_root(MainWindow, table_name, MainWindow.UserStatus)
-        if MainWindow.UserStatus.User_mode == "C":
+        elif MainWindow.UserStatus.User_mode == "C":
             TreeViewSqlAction.User_is_C(MainWindow, table_name, MainWindow.UserStatus)
+        elif MainWindow.UserStatus.User_mode == "P":
+            TreeViewSqlAction.User_is_GG(MainWindow, table_name, MainWindow.UserStatus)
         
 
 
@@ -129,7 +131,6 @@ class TreeViewSqlAction:
             MainWindow.TableSttus.Update(table_name, data, description)
 
             
-
     @staticmethod
     def User_is_GG(MainWindow, table_name, UserStatus):
         """
@@ -142,11 +143,27 @@ class TreeViewSqlAction:
             QMessageBox.information(MainWindow.Qw,'MSG B',
                         "User mode is changed when you clicked. Failed to load!",QMessageBox.Yes|QMessageBox.No,QMessageBox.Yes)
         else:
+            SQL_Sentence = None
             if table_name == "S":
                 SQL_Sentence = "select * from S;"
             elif table_name == "D":
-                # TODO
-                SQL_Sentence = ""
+                _buf_col_ = "distinct GGD.GGNo,GGD.DNo,D.DNo,S.SName,D.CNo,D.DPay_yn,D.DS_yn,DM_yn,C.CPhone,C.CAddr,C.CName"
+                SQL_Sentence = "select {a} from D,GGD,S,C,DS,GS,G where GGD.DNo=D.DNo and GGD.GGNo='{b}'and S.SNo=DS.SNo and C.CNo=G.CNo and D.CNo=C.CNo and DS.DNo=D.DNo;".format(
+                    a=_buf_col_,
+                    b=UserStatus.User_info
+                )
+            elif table_name == "GG":
+                SQL_Sentence = "select * from GG where GG.GGNo='{a}';".format(a=UserStatus.User_info)
+            if SQL_Sentence is not None:
+                data = SqlSearch.SelfDefind_S_direct(MainWindow.SqlConn, SQL_Sentence)
+                description = SqlSearch.Get_Table_description_direct(MainWindow.SqlConn, SQL_Sentence)
+                TableSqlAction.TableViewUpdate(MainWindow, description, data)
+                MainWindow.TableSttus.Update(table_name, data, description)
+            else:
+                logging.info("can't reach")
+                QMessageBox.information(MainWindow.Qw,'MSG B',
+                        "你不能查看这张表!!!",QMessageBox.Yes|QMessageBox.No,QMessageBox.Yes)
+
 
     @staticmethod
     def User_is_root(MainWindow, table_name, UserStatus):
