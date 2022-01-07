@@ -1,3 +1,8 @@
+"""
+@Author:    chenghua.Wang
+@file:      src/main.py
+@brief:     main function. Enter.
+"""
 import os
 import sys
 sys.path.append(os.path.split(sys.path[0])[0])

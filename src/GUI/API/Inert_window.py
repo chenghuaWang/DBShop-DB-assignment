@@ -7,12 +7,16 @@ import os
 import sys
 sys.path.append(os.path.split(sys.path[0])[0])
 
+import logging
+logging.getLogger().setLevel(logging.DEBUG)
+
 from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtWidgets import QAbstractItemView, QHeaderView, QMessageBox, QTableWidget, QWidget, qApp, QInputDialog
 from PyQt5.QtCore import QObject, Qt
 from PyQt5.QtGui import QStandardItemModel, QStandardItem, QCursor
 
 from core.SqlMan import SqlSearch_DS
+from logic.SqlInsert import SqlInsert
 
 class Insert_Window(QtWidgets.QDialog):
     def __init__(self, func_cls, MainWindow):
@@ -91,7 +95,32 @@ class Insert_Window(QtWidgets.QDialog):
         self.UpdateTableData(self.TableData, self.TableDescribe)
 
     def SubmitButton_action(self):
-        pass
+        """
+        First check first line of data is empty or not.
+        """
+        SQL_Sentence = []
+        StartRow = 0
+        if self.tableWidget.item(0, 0).text() == "":
+            StartRow = 1
+        else:
+            if self.MainWindow.TableStatus.TableName == "S":
+                for idx in range(StartRow, self.TableData.NumRow_f()):
+                    _buf_value_ = "('{a}','{b}','{c}',{d},{e})".format(
+                        a=self.TableData.m_row[idx][0],
+                        b=self.TableData.m_row[idx][1],
+                        c=self.TableData.m_row[idx][2],
+                        d=self.TableData.m_row[idx][3],
+                        e=self.TableData.m_row[idx][4]
+                    )
+                    _buf_sql_ = "insert into "+self.MainWindow.TableStatus.TableName+" VALUES"+_buf_value_
+                    SQL_Sentence.append(_buf_sql_)
+                """
+                如果是商户登录，那么商品需要和GGS表挂钩，意味着需要更新GGS表
+                """
+            for item in SQL_Sentence:
+                logging.info(item)
+                SqlInsert.EX_I(self.MainWindow.SqlConn,item)
+        
 
     def UpdateTableData(self, Data, HeaderLabel):
         if Data.NumRow_f() == 0:

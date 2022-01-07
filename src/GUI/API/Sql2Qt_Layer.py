@@ -187,6 +187,20 @@ class TreeViewSqlAction:
 class MenuInsertSqlAction:
     @staticmethod
     def main(MainWindow):
-        MainWindow.Insert_childWindow.initData()
-        MainWindow.Insert_childWindow.show()
-
+        """
+        "P" can insert to "S"
+        "r" can insert to "all"
+        """
+        if MainWindow.UserStatus.User_mode in ["P", "r"]:
+            if MainWindow.UserStatus.User_mode == "P" and MainWindow.TableStatus.TableName == "S":
+                MainWindow.Insert_childWindow.initData()
+                MainWindow.Insert_childWindow.show()
+            elif MainWindow.UserStatus.User_mode == "r":
+                MainWindow.Insert_childWindow.initData()
+                MainWindow.Insert_childWindow.show()
+            else:
+                QMessageBox.information(MainWindow.Qw,'MSG B',
+                        "商户只能增加S表的信息!",QMessageBox.Yes|QMessageBox.No,QMessageBox.Yes)
+        else:
+            QMessageBox.information(MainWindow.Qw,'MSG B',
+                        "客户不能直接插入数据!",QMessageBox.Yes|QMessageBox.No,QMessageBox.Yes)
