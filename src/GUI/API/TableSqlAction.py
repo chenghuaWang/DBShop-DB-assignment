@@ -31,3 +31,7 @@ class TableSqlAction:
         MainWindow.tableView.setModel(model)
         MainWindow.tableView.horizontalHeader().setStretchLastSection(True)
         MainWindow.tableView.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
+
+    @staticmethod
+    def TableViewRightClickMain(MainWindow):
+        pass

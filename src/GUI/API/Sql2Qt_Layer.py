@@ -82,6 +82,8 @@ class TreeViewSqlAction:
         table_name = TreeViewSqlAction.getTableName(QModelidx)
         if MainWindow.UserStatus.User_mode == "r":
             TreeViewSqlAction.User_is_root(MainWindow, table_name, MainWindow.UserStatus)
+        if MainWindow.UserStatus.User_mode == "C":
+            TreeViewSqlAction.User_is_C(MainWindow, table_name, MainWindow.UserStatus)
         
 
 
@@ -96,15 +98,55 @@ class TreeViewSqlAction:
         WARNNING:
         This function need to return A status wether other Action in MainWindow need be execute.
         """
+        if UserStatus.User_mode != 'C':
+            logging.error("User mode is changed when you clicked. Failed to load")
+            QMessageBox.information(MainWindow.Qw,'MSG B',
+                        "User mode is changed when you clicked. Failed to load!",QMessageBox.Yes|QMessageBox.No,QMessageBox.Yes)
+        else:
+            if table_name == "C":
+                SQL_Sentence = "select * from C where CNo='{a}';".format(a=UserStatus.User_info)
+            elif table_name == "G":
+                _buf_col = "G.GNo,C.CNo,S.SNo,S.SName,S.SKind,S.SPrice,S.SInventory,GS.GSNum"
+                SQL_Sentence = "select {a} from C,G,GS,S where C.CNo=G.CNo and G.GNo=GS.GNo and GS.SNo=S.SNo and C.CNo='{b}';".format(
+                    a=_buf_col,
+                    b=UserStatus.User_info
+                )
+                #TODO right click
+            elif table_name == "D":
+                _buf_col = "D.DNo,D.CNo,D.Dpay,DPay_yn,DS_yn,DM_yn,S.SNo,S.SName,DS.DSNum,S.SKind,S.SPrice,S.SInventory"
+                SQL_Sentence = "select {a} from D,DS,S where D.CNo='{b}' and D.DNo=DS.DNo and DS.SNo=S.SNo;".format(
+                    a=_buf_col,
+                    b=UserStatus.User_info
+                )
+            elif table_name == "GG":
+                SQL_Sentence = "select * from GG;"
+            elif table_name == "S":
+                SQL_Sentence = "select * from S;"
+                #TODO right click
+            data = SqlSearch.SelfDefind_S_direct(MainWindow.SqlConn, SQL_Sentence)
+            description = SqlSearch.Get_Table_description_direct(MainWindow.SqlConn, SQL_Sentence)
+            TableSqlAction.TableViewUpdate(MainWindow, description, data)
+            MainWindow.TableSttus.Update(table_name, data, description)
 
-        pass
+            
 
     @staticmethod
     def User_is_GG(MainWindow, table_name, UserStatus):
         """
-        
+        GG is the supporter of S.
+        They can not see G Table Custom Table.
+        Thay are aable to access in to S, GG, D Table
         """
-        pass
+        if UserStatus.User_mode != 'P':
+            logging.error("User mode is changed when you clicked. Failed to load")
+            QMessageBox.information(MainWindow.Qw,'MSG B',
+                        "User mode is changed when you clicked. Failed to load!",QMessageBox.Yes|QMessageBox.No,QMessageBox.Yes)
+        else:
+            if table_name == "S":
+                SQL_Sentence = "select * from S;"
+            elif table_name == "D":
+                # TODO
+                SQL_Sentence = ""
 
     @staticmethod
     def User_is_root(MainWindow, table_name, UserStatus):
@@ -116,24 +158,12 @@ class TreeViewSqlAction:
             QMessageBox.information(MainWindow.Qw,'MSG B',
                         "User mode is changed when you clicked. Failed to load!",QMessageBox.Yes|QMessageBox.No,QMessageBox.Yes)
         else:
-            if table_name in ["C", "S", "GG"]:
+            if table_name in ["C", "S", "GG", "D"]:
                 SQL_Sentence = "select * from {a};".format(a=table_name)
             elif table_name == "G":
                 _buf_col = "G.GNo,G.CNo,S.SNo,S.SName,S.SKind,S.SPrice,S.SInventory,GS.GSNum"
                 SQL_Sentence = "select {a} from G,C,GS,S where G.GNo=GS.GNo and GS.SNo=S.SNo and G.CNo=C.CNo;".format(a=_buf_col)
-            # SQL_Sentence = "select * from {a};".format(a=table_name)
             data = SqlSearch.SelfDefind_S_direct(MainWindow.SqlConn, SQL_Sentence)
             description = SqlSearch.Get_Table_description_direct(MainWindow.SqlConn, SQL_Sentence)
             TableSqlAction.TableViewUpdate(MainWindow, description, data)
             MainWindow.TableSttus.Update(table_name, data, description)
-
-
-    @staticmethod
-    def TreeViewChanged_S(SqlConn, table_name, UserStatus):
-        # TODO
-        if table_name == UserStatus.UserTable():
-            return LoginSqlAction.GetUserTable(SqlConn, UserStatus.User_info, table_name)
-        else:
-            TABLE = table_name + "," + UserStatus.UserTable()
-            __data__ = SqlSearch.SelfDefined_S(SqlConn, "*", TABLE, "where CNo='{a}'".format(a=UserStatus.User_info))
-            __describtion__ = SqlSearch.Get_Table_description(SqlConn, "*", TABLE, "where CNO=")  # TODO
