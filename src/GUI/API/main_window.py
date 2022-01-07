@@ -22,7 +22,7 @@ from GUI.API.CurrentTableStatus import CurrentTableStatus
 
 class UI_MainWindow():
     def __init__(self, MainWindow, SqlConn):
-        self.TableSttus = CurrentTableStatus("default")
+        self.TableStatus = CurrentTableStatus("default")
         self.UserStatus = UserStatus_DS("default", "default")
         self.MainWindow = MainWindow
         self.SqlConn = SqlConn

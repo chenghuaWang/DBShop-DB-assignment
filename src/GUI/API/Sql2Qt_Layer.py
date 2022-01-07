@@ -28,19 +28,19 @@ class LoginSqlAction:
             data = SqlSearch.SelfDefind_S_direct(MainWindow.SqlConn, SQL_Sentence)
             description = SqlSearch.Get_Table_description_direct(MainWindow.SqlConn, SQL_Sentence)
             TableSqlAction.TableViewUpdate(MainWindow, description, data)
-            MainWindow.TableSttus.Update("C", data, description)
+            MainWindow.TableStatus.Update("C", data, description)
         elif UserType == 'P':
             SQL_Sentence = "select * from GG where GGNo='{a}';".format(a=ID)
             data = SqlSearch.SelfDefind_S_direct(MainWindow.SqlConn, SQL_Sentence)
             description = SqlSearch.Get_Table_description_direct(MainWindow.SqlConn, SQL_Sentence)
             TableSqlAction.TableViewUpdate(MainWindow, description, data)
-            MainWindow.TableSttus.Update("GG", data, description)
+            MainWindow.TableStatus.Update("GG", data, description)
         elif UserType == 'r':
             SQL_Sentence = "select * from C;"
             data = SqlSearch.SelfDefind_S_direct(MainWindow.SqlConn, SQL_Sentence)
             description = SqlSearch.Get_Table_description_direct(MainWindow.SqlConn, SQL_Sentence)
             TableSqlAction.TableViewUpdate(MainWindow, description, data)
-            MainWindow.TableSttus.Update("C", data, description)
+            MainWindow.TableStatus.Update("C", data, description)
 
     @staticmethod
     def LoginWindow_TableViewChange(MainWindow, ID, TableName):
@@ -128,7 +128,7 @@ class TreeViewSqlAction:
             data = SqlSearch.SelfDefind_S_direct(MainWindow.SqlConn, SQL_Sentence)
             description = SqlSearch.Get_Table_description_direct(MainWindow.SqlConn, SQL_Sentence)
             TableSqlAction.TableViewUpdate(MainWindow, description, data)
-            MainWindow.TableSttus.Update(table_name, data, description)
+            MainWindow.TableStatus.Update(table_name, data, description)
 
             
     @staticmethod
@@ -158,7 +158,7 @@ class TreeViewSqlAction:
                 data = SqlSearch.SelfDefind_S_direct(MainWindow.SqlConn, SQL_Sentence)
                 description = SqlSearch.Get_Table_description_direct(MainWindow.SqlConn, SQL_Sentence)
                 TableSqlAction.TableViewUpdate(MainWindow, description, data)
-                MainWindow.TableSttus.Update(table_name, data, description)
+                MainWindow.TableStatus.Update(table_name, data, description)
             else:
                 logging.info("can't reach")
                 QMessageBox.information(MainWindow.Qw,'MSG B',
@@ -183,4 +183,4 @@ class TreeViewSqlAction:
             data = SqlSearch.SelfDefind_S_direct(MainWindow.SqlConn, SQL_Sentence)
             description = SqlSearch.Get_Table_description_direct(MainWindow.SqlConn, SQL_Sentence)
             TableSqlAction.TableViewUpdate(MainWindow, description, data)
-            MainWindow.TableSttus.Update(table_name, data, description)
+            MainWindow.TableStatus.Update(table_name, data, description)
