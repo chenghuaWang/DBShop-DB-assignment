@@ -19,6 +19,9 @@ class TableSqlAction:
         # Reference: https://blog.csdn.net/jia666666/article/details/81624259
         # Reference button: https://blog.csdn.net/yy123xiang/article/details/78777964
         # U should use `.encode('latin1').decode('gbk')` to get correct characters.
+        if Data.NumRow == 0:
+            QMessageBox.information(MainWindow.Qw,'Search Failed',
+                        "Table Don't have data matched!",QMessageBox.Yes|QMessageBox.No,QMessageBox.Yes)
         model=QStandardItemModel(Data.NumRow, Data.NumCol)
         model.setHorizontalHeaderLabels(HeaderLabel)
         for row in range(Data.NumRow):

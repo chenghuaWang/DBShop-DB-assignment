@@ -6,6 +6,8 @@
 
 import os
 import sys
+
+from src.GUI.API.Sql2Qt_Layer import TreeViewSqlAction
 sys.path.append(os.path.split(sys.path[0])[0])
 
 from PyQt5 import QtCore, QtGui, QtWidgets
@@ -16,9 +18,11 @@ from PyQt5.QtGui import QStandardItemModel, QStandardItem
 from GUI.API.Sql2Qt_Layer import LoginSqlAction
 from GUI.API.UserStatus import UserStatus_DS
 from GUI.API.TableSqlAction import TableSqlAction
+from GUI.API.CurrentTableStatus import CurrentTableStatus
 
 class UI_MainWindow():
     def __init__(self, MainWindow, SqlConn):
+        self.TableSttus = CurrentTableStatus("default")
         self.UserStatus = UserStatus_DS("default", "default")
         self.MainWindow = MainWindow
         self.SqlConn = SqlConn
@@ -123,7 +127,6 @@ class UI_MainWindow():
         self.actionSort.setText(_translate("MainWindow", "排序"))
         self.actionLogin.setStatusTip(_translate("MainWindow", "sort in oreder"))
 
-    
     # -- TreeView
     def TreeViewInit(self, MainWindow):
         # -- Add head info
@@ -175,17 +178,7 @@ class UI_MainWindow():
 
     # -- TreeView clicked Action
     def TreeViewClickedAction(self, QModelidx):
-        if QModelidx.row() == 0:
-            table_name = "C"
-        elif QModelidx.row() == 1:
-            table_name = "S"
-        elif QModelidx.row() == 2:
-            table_name = "G"
-        elif QModelidx.row() == 3:
-            table_name = "GG"
-        elif QModelidx.row() == 4:
-            table_name = "D"
-        print(table_name)
+        TreeViewSqlAction.main(self, QModelidx)
 
     # -- Login Window Action Maker
     def LoginWindowShow(self):

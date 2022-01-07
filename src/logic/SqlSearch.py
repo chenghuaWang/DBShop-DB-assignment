@@ -31,6 +31,7 @@ class SqlSearch:
         """
         Same as Get_Table_description. But use Sql sentence directly.
         """
+        col = []
         cursor = SqlConn.conn.cursor()
         try:
             cursor.execute(rhs)
