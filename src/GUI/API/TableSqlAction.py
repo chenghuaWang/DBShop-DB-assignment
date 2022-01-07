@@ -15,6 +15,9 @@ from PyQt5.QtCore import QObject, Qt
 from PyQt5.QtGui import QStandardItemModel, QStandardItem, QCursor
 
 from logic.SqlDelete import SqlDelete
+from logic.SqlSearch import SqlSearch
+
+from GUI.API.SearchTable_window import SearchTable_Window
 
 class TableSqlAction:
     @staticmethod
@@ -59,10 +62,34 @@ class TableSqlAction:
         pass
 
     @staticmethod
+    def TableViewRightClick_SearchSupportor(MainWindow, qt_Modelidx):
+        """
+        This function only show in Table G and S.
+        In S Table col of SNo is 0,
+        In G Table col of SNo is 2.
+        """
+        row = qt_Modelidx.row()
+        col = qt_Modelidx.column()
+        SNo_idx_in_S = MainWindow.TableStatus.describe.index("SNo")
+        _buf_SNo = MainWindow.TableStatus.data.m_row[row][SNo_idx_in_S]
+        SQL_Sentence = "select * from S,GG where S.SNo='{a}' and S.SNo=GG.SNo;".format(
+            a=_buf_SNo
+        )
+        _data_ = SqlSearch.SelfDefind_S_direct(MainWindow.SqlConn,SQL_Sentence)
+        _describe_ = SqlSearch.Get_Table_description_direct(MainWindow.SqlConn, SQL_Sentence)
+        MainWindow.SearchTable_childWindow.UpdateTableData(TableSqlAction, _data_, _describe_)
+        MainWindow.SearchTable_childWindow.show()
+
+    @staticmethod
     def TableRightMenuContent(MainWindow, qt_point):
         qt_Modleidx = QtWidgets.QTableView.indexAt(MainWindow.tableView,qt_point)
         # print(qt_Modleidx.row(), qt_Modleidx.column())
         MainWindow.tableView.contextMenu = QMenu(MainWindow.Qw)
+        MainWindow.statusbar.showMessage("Choose Table {a}, Row{b}, Col{c}".format(
+            a=MainWindow.TableStatus.TableName,
+            b=qt_Modleidx.row(),
+            c=qt_Modleidx.column()
+        ))
         """
         All Table is "C", "S", "G", "GG", "D"
         Build numerous Action for different Table and User.
@@ -88,22 +115,40 @@ class TableSqlAction:
         Can delete All Item from every table. 
         """
         if MainWindow.UserStatus.User_mode == "C":
-            if MainWindow.TableStatus.TableName == "C":
+            if MainWindow.TableStatus.TableName in ["C", "GG", "D"]:
                 pass
             elif MainWindow.TableStatus.TableName == "S":
-                MainWindow.actionAdd2G_one = MainWindow.tableView.contexMenu.addAction(r"添加一件到购物车")
+                MainWindow.actionAdd2G_one = MainWindow.tableView.contextMenu.addAction(r"添加一件到购物车")
                 # TODO add function
-                MainWindow.actionAdd2G_multi = MainWindow.tableView.contexMenu.addAction(r"添加多项到购物车")
+                MainWindow.actionAdd2G_multi = MainWindow.tableView.contextMenu.addAction(r"添加多件到购物车")
                 # TODO add function
-                MainWindow.actionSearchSupportor = MainWindow.tableView.contexMenu.addAction(r"查找供应商")
-                #TODO Add function
+                MainWindow.actionSearchSupportor = MainWindow.tableView.contextMenu.addAction(r"查找供应商")
+                MainWindow.actionSearchSupportor.triggered.connect(
+                    lambda:TableSqlAction.TableViewRightClick_SearchSupportor(MainWindow, qt_Modleidx)
+                )
             elif MainWindow.TableStatus.TableName == "G":
-                MainWindow.actionDelete_one  = MainWindow.tableView.contexMenu.addAction(r"删除一项")
+                MainWindow.actionDelete_one  = MainWindow.tableView.contextMenu.addAction(r"删除一件")
                 # TODO delete function
-                MainWindow.actionDelete_all = MainWindow.tableView.contexMenu.addAction(r"删除多项")
+                MainWindow.actionDelete_all = MainWindow.tableView.contextMenu.addAction(r"删除多件")
                 # TODO delete function
-                MainWindow.actionSearchSupportor = MainWindow.tableView.contexMenu.addAction(r"查找供应商")
+                MainWindow.actionSearchSupportor = MainWindow.tableView.contextMenu.addAction(r"查找供应商")
+                MainWindow.actionSearchSupportor.triggered.connect(
+                    lambda:TableSqlAction.TableViewRightClick_SearchSupportor(MainWindow, qt_Modleidx)
+                )
+                MainWindow.actionPush2D = MainWindow.tableView.contextMenu.addAction(r"推送购物车内容到订单")
                 # Add function
+        elif MainWindow.UserStatus.User_mode == "P":
+            if MainWindow.TableStatus.TableName in ["C", "GG", "D"]:
+                pass
+            elif MainWindow.TableStatus.TableName == "S":
+                # first we should change into S table belong to P first.
+                MainWindow.actionDelete_one = MainWindow.tableView.contextMenu.addAction(r"删除一件")
+                #TODO delete function
+                MainWindow.actionDelete_all = MainWindow.tableView.contextMenu.addAction(r"删除多件")
+                #TODO delete function
+        elif MainWindow.UserStatus.User_mode == "r":
+            MainWindow.actionDelete_one = MainWindow.tableView.contextMenu.addAction(r"删除该行")
+            #TODO delete function
 
         
         # MainWindow.actionDelete = MainWindow.tableView.contextMenu.addAction(r"删除一项")

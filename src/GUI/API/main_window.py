@@ -1,13 +1,11 @@
 """
 @Author:    chenghua.Wang
-@file:      src/GUI/main_ui.py
+@file:      src/GUI/API/main_window.py
 @brief:     Main window of Qt   
 """
 
 import os
 import sys
-
-from src.GUI.API.Sql2Qt_Layer import TreeViewSqlAction
 sys.path.append(os.path.split(sys.path[0])[0])
 
 from PyQt5 import QtCore, QtGui, QtWidgets
@@ -19,9 +17,12 @@ from GUI.API.Sql2Qt_Layer import LoginSqlAction
 from GUI.API.UserStatus import UserStatus_DS
 from GUI.API.TableSqlAction import TableSqlAction
 from GUI.API.CurrentTableStatus import CurrentTableStatus
+from GUI.API.Sql2Qt_Layer import TreeViewSqlAction
+from GUI.API.SearchTable_window import SearchTable_Window
 
 class UI_MainWindow():
     def __init__(self, MainWindow, SqlConn):
+        self.SearchTable_childWindow = SearchTable_Window()
         self.TableStatus = CurrentTableStatus("default")
         self.UserStatus = UserStatus_DS("default", "default")
         self.MainWindow = MainWindow
@@ -60,6 +61,7 @@ class UI_MainWindow():
         self.tableView.setObjectName("tableView")
         self.tableView.setContextMenuPolicy(Qt.CustomContextMenu)  # set right menu start.
         self.tableView.customContextMenuRequested.connect(self.TableshowContextMenu)
+        self.tableView.setSortingEnabled(True)
         self.horizontalLayout.addWidget(self.tableView)
         self.gridLayout.addLayout(self.horizontalLayout, 1, 0, 1, 1)
         MainWindow.setCentralWidget(self.centralwidget)
@@ -87,11 +89,14 @@ class UI_MainWindow():
         self.actionLogin.setObjectName("actionLogin")
         self.actionSort = QtWidgets.QAction(MainWindow)
         self.actionSort.setObjectName("actionSort")
+        self.actionInsert = QtWidgets.QAction(MainWindow)
+        self.actionInsert.setObjectName("actionInsert")
         # -- menu action
         self.menu.addAction(self.actionQuit)
         self.menu.addAction(self.actionSearch)
         self.menu_2.addAction(self.actionLogin)
         self.menu_3.addAction(self.actionSort)
+        self.menu_3.addAction(self.actionInsert)
         self.menubar.addAction(self.menu.menuAction())
         self.menubar.addAction(self.menu_2.menuAction())
         self.menubar.addAction(self.menu_3.menuAction())
@@ -114,6 +119,13 @@ class UI_MainWindow():
         self.actionSearch.setText(_translate("MainWindow", "Search"))
         self.actionSearch.setShortcut(_translate("MainWindow", "Ctrl+S"))
         self.actionSearch.setStatusTip(_translate("MainWindow", "Search in sql or script defined"))
+        # -- Sort
+        self.actionSort.setText(_translate("MainWindow", "排序"))
+        self.actionLogin.setStatusTip(_translate("MainWindow", "sort in oreder"))
+        # -- insert
+        self.actionInsert.setText(_translate("MainWindow", "插入"))
+        self.actionInsert.setShortcut(_translate("MainWindow", "Ctrl+I"))
+        self.actionInsert.setStatusTip(_translate("MainWindow", "Insert into Table"))
         # -- Login.
         r"""
         User should first login.
@@ -125,9 +137,6 @@ class UI_MainWindow():
         self.actionLogin.setShortcut(_translate("MainWindow", "Ctrl+L"))
         self.actionLogin.setStatusTip(_translate("MainWindow", "Login. User or root-Manager"))
         self.actionLogin.triggered.connect(lambda: self.LoginWindowShow())
-        # -- Sort
-        self.actionSort.setText(_translate("MainWindow", "排序"))
-        self.actionLogin.setStatusTip(_translate("MainWindow", "sort in oreder"))
 
     # -- TreeView
     def TreeViewInit(self, MainWindow):

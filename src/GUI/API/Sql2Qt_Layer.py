@@ -113,7 +113,6 @@ class TreeViewSqlAction:
                     a=_buf_col,
                     b=UserStatus.User_info
                 )
-                #TODO right click
             elif table_name == "D":
                 _buf_col = "D.DNo,D.CNo,D.Dpay,DPay_yn,DS_yn,DM_yn,S.SNo,S.SName,DS.DSNum,S.SKind,S.SPrice,S.SInventory"
                 SQL_Sentence = "select {a} from D,DS,S where D.CNo='{b}' and D.DNo=DS.DNo and DS.SNo=S.SNo;".format(
@@ -124,7 +123,6 @@ class TreeViewSqlAction:
                 SQL_Sentence = "select * from GG;"
             elif table_name == "S":
                 SQL_Sentence = "select * from S;"
-                #TODO right click
             data = SqlSearch.SelfDefind_S_direct(MainWindow.SqlConn, SQL_Sentence)
             description = SqlSearch.Get_Table_description_direct(MainWindow.SqlConn, SQL_Sentence)
             TableSqlAction.TableViewUpdate(MainWindow, description, data)
