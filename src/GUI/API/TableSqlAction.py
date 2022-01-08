@@ -3,11 +3,11 @@
 @file:      src/GUI/TableSqlAction.py
 @brief:     Table Action Logic. Independent.
 """
-import logging
 import os
-from string import ascii_uppercase
 import sys
 sys.path.append(os.path.split(sys.path[0])[0])
+
+import logging
 
 from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtWidgets import QHeaderView, QMessageBox, QMenu, QWidget, qApp, QInputDialog
@@ -73,7 +73,7 @@ class TableSqlAction:
         col = qt_Modelidx.column()
         SNo_idx_in_S = MainWindow.TableStatus.describe.index("SNo")
         _buf_SNo = MainWindow.TableStatus.data.m_row[row][SNo_idx_in_S]
-        SQL_Sentence = "select * from S,GG where S.SNo='{a}' and S.SNo=GG.SNo;".format(
+        SQL_Sentence = "select * from S,GG,GGS where S.SNo='{a}' and GGS.GGNo=GG.GGNo and GGS.SNo=S.SNo;".format(
             a=_buf_SNo
         )
         _data_ = SqlSearch.SelfDefind_S_direct(MainWindow.SqlConn,SQL_Sentence)

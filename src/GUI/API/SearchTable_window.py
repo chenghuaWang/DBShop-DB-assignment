@@ -19,6 +19,7 @@ class SearchTable_Window(QDialog):
         self.setupUi()
 
     def setupUi(self):
+        self.Qw = QWidget()
         self.setObjectName("Form")
         self.resize(974, 712)
         self.gridLayout = QtWidgets.QGridLayout(self)

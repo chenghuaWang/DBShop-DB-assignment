@@ -146,13 +146,17 @@ class TreeViewSqlAction:
             if table_name == "S":
                 SQL_Sentence = "select * from S;"
             elif table_name == "D":
-                _buf_col_ = "distinct GGD.GGNo,GGD.DNo,D.DNo,S.SName,D.CNo,D.DPay_yn,D.DS_yn,DM_yn,C.CPhone,C.CAddr,C.CName"
+                _buf_col_ = "distinct GGD.GGNo,GGD.DNo,S.SName,D.CNo,D.DPay_yn,D.DS_yn,DM_yn,C.CPhone,C.CAddr,C.CName"
                 SQL_Sentence = "select {a} from D,GGD,S,C,DS,GS,G where GGD.DNo=D.DNo and GGD.GGNo='{b}'and S.SNo=DS.SNo and C.CNo=G.CNo and D.CNo=C.CNo and DS.DNo=D.DNo;".format(
                     a=_buf_col_,
                     b=UserStatus.User_info
                 )
             elif table_name == "GG":
-                SQL_Sentence = "select * from GG where GG.GGNo='{a}';".format(a=UserStatus.User_info)
+                _buf_ = "GG.GGNo,GG.GGName,GG.GGAddr,S.SNo,S.SName,S.SKind,S.SPrice,S.SInventory"
+                SQL_Sentence = "select {cho} from GG,S,GGS where GG.GGNo='{a}' and GG.GGNo=GGS.GGNo and S.SNo=GGS.SNo;".format(
+                    cho=_buf_,
+                    a=UserStatus.User_info
+                )
             if SQL_Sentence is not None:
                 data = SqlSearch.SelfDefind_S_direct(MainWindow.SqlConn, SQL_Sentence)
                 description = SqlSearch.Get_Table_description_direct(MainWindow.SqlConn, SQL_Sentence)

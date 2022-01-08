@@ -123,13 +123,18 @@ class Insert_Window(QtWidgets.QDialog):
                 如果是商户登录，那么商品需要和GGS表挂钩，意味着需要更新GG表
                 """
                 if self.MainWindow.UserStatus.User_mode == "P":
-                    SqlInsert.EX_I("insert into GG VALUES('{a}','{b}',)")
-                    SqlInsert.EX_I("insert into GGS VALUES('{a}','{b}')") # 少一张表
+                    for item in SQL_Sentence:
+                        SqlInsert.EX_I(self.MainWindow.SqlConn,item)
+                    SqlInsert.EX_I(self.MainWindow.SqlConn, "insert into GGS VALUES('{a}','{b}')".format(
+                        a=self.TableData.m_row[idx][0],
+                        b=self.MainWindow.UserStatus.User_info
+                    ))
+                else:
+                    for item in SQL_Sentence:
+                        logging.info(item)
+                        SqlInsert.EX_I(self.MainWindow.SqlConn,item)
             elif self.MainWindow.TableStatus.TableName == "GG":
                 pass
-            for item in SQL_Sentence:
-                logging.info(item)
-                SqlInsert.EX_I(self.MainWindow.SqlConn,item)
             self.func_cls.TableFlushes(self.MainWindow)
             self.close()
         
