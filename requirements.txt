@@ -1,0 +1,3 @@
+pymssql==2.1.5
+PyQt5==5.15.6
+qt_material==2.8.19
