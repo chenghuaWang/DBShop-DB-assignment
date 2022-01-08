@@ -18,4 +18,4 @@ class SqlChange:
         However, this function has highest level of all db,
         use it carefully
         """
-        return SqlConn.EX(rhs)
+        SqlConn.EX(rhs)

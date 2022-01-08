@@ -103,6 +103,8 @@ class Insert_Window(QtWidgets.QDialog):
         if self.tableWidget.item(0, 0).text() == "":
             StartRow = 1
         else:
+            self.AddItemButton_action()
+            StartRow = 1
             if self.MainWindow.TableStatus.TableName == "S":
                 for idx in range(StartRow, self.TableData.NumRow_f()):
                     _buf_value_ = "('{a}','{b}','{c}',{d},{e})".format(
@@ -115,11 +117,17 @@ class Insert_Window(QtWidgets.QDialog):
                     _buf_sql_ = "insert into "+self.MainWindow.TableStatus.TableName+" VALUES"+_buf_value_
                     SQL_Sentence.append(_buf_sql_)
                 """
-                如果是商户登录，那么商品需要和GGS表挂钩，意味着需要更新GGS表
+                如果是商户登录，那么商品需要和GGS表挂钩，意味着需要更新GG表
                 """
+                if self.MainWindow.UserStatus.User_mode == "P":
+                    SqlInsert.EX_I("insert into GG VALUES('{a}','{b}')") # 少一张表
+            elif self.MainWindow.TableStatus.TableName == "GG":
+                pass
             for item in SQL_Sentence:
                 logging.info(item)
                 SqlInsert.EX_I(self.MainWindow.SqlConn,item)
+            self.func_cls.TableFlushes(self.MainWindow)
+            self.close()
         
 
     def UpdateTableData(self, Data, HeaderLabel):

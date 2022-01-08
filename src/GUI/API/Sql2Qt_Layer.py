@@ -5,6 +5,9 @@
 """
 import os
 import sys
+
+from src.core.SqlMan import SqlMan
+from src.logic.SqlChange import SqlChange
 sys.path.append(os.path.split(sys.path[0])[0])
 import logging
 
@@ -87,8 +90,6 @@ class TreeViewSqlAction:
         elif MainWindow.UserStatus.User_mode == "P":
             TreeViewSqlAction.User_is_GG(MainWindow, table_name, MainWindow.UserStatus)
         
-
-
     @staticmethod
     def User_is_C(MainWindow, table_name, UserStatus):
         """
@@ -127,8 +128,7 @@ class TreeViewSqlAction:
             description = SqlSearch.Get_Table_description_direct(MainWindow.SqlConn, SQL_Sentence)
             TableSqlAction.TableViewUpdate(MainWindow, description, data)
             MainWindow.TableStatus.Update(table_name, data, description)
-
-            
+           
     @staticmethod
     def User_is_GG(MainWindow, table_name, UserStatus):
         """
@@ -161,7 +161,6 @@ class TreeViewSqlAction:
                 logging.info("can't reach")
                 QMessageBox.information(MainWindow.Qw,'MSG B',
                         "你不能查看这张表!!!",QMessageBox.Yes|QMessageBox.No,QMessageBox.Yes)
-
 
     @staticmethod
     def User_is_root(MainWindow, table_name, UserStatus):
@@ -204,3 +203,40 @@ class MenuInsertSqlAction:
         else:
             QMessageBox.information(MainWindow.Qw,'MSG B',
                         "客户不能直接插入数据!",QMessageBox.Yes|QMessageBox.No,QMessageBox.Yes)
+
+
+class LineEditSqlAction:
+    @staticmethod
+    def main(MainWindow):
+        text_buf = MainWindow.lineEdit.text()
+        MainWindow.lineEdit.setText("")
+        LineEditSqlAction.Exc(MainWindow, LineEditSqlAction.Phaser(text_buf))
+
+    @staticmethod
+    def Phaser(rhs):
+        """
+        sql:select * from ...
+        sql_search:select...
+        info:Version
+        """
+        return rhs.split(":")
+
+    @staticmethod
+    def Exc(MainWindow, rhs_list):
+        if rhs_list[0] == "sql":
+            SqlChange.EX_C(MainWindow.SqlConn, rhs_list[1])
+            MainWindow.statusbar.showMessage("sql->{a}".format(a=rhs_list[1]), 2*1000)
+        elif rhs_list[0] == "info":
+            if rhs_list[1] == "Version":
+                MainWindow.statusbar.showMessage("info->Vision. 0.0.6 beta", 10*1000)
+        elif rhs_list[0] == "sql_search":
+            try:
+                _data_ = SqlSearch.SelfDefind_S_direct(MainWindow.SqlConn, rhs_list[1])
+                _describe_ = SqlSearch.Get_Table_description_direct(MainWindow.SqlConn, rhs_list[1])
+                MainWindow.SearchTable_childWindow.UpdateTableData(TableSqlAction, _data_, _describe_)
+                MainWindow.SearchTable_childWindow.show()
+            except:
+                logging.error("Sql sentence wrong in lineEdit!")
+                QMessageBox.information(MainWindow.Qw,'ERROR',
+                        "Sql sentence wrong in lineEdit!",QMessageBox.Yes|QMessageBox.No,QMessageBox.Yes)
+

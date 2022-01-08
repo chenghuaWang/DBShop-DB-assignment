@@ -16,6 +16,7 @@ from PyQt5.QtGui import QStandardItemModel, QStandardItem, QCursor
 
 from logic.SqlDelete import SqlDelete
 from logic.SqlSearch import SqlSearch
+from logic.SqlChange import SqlChange
 
 from GUI.API.SearchTable_window import SearchTable_Window
 
@@ -81,6 +82,119 @@ class TableSqlAction:
         MainWindow.SearchTable_childWindow.show()
 
     @staticmethod
+    def TableViewRightClick_Change(MainWindow, qt_Modelidx):
+        """
+        The No is always the first col of table.
+        """
+        row = qt_Modelidx.row()
+        col = qt_Modelidx.column()
+        Primary_index_name = MainWindow.TableStatus.TableName + "No"
+        Key_want_change_name = MainWindow.TableStatus.describe[col]
+        value, ok_value = QInputDialog.getText(MainWindow.Qw, 'Value change.', 'Enter new data:')
+        if ok_value:
+            try:
+                SQL_sentence = "update {a} set {b}='{c}' where {d}='{e}';".format(
+                    a=MainWindow.TableStatus.TableName,
+                    b=Key_want_change_name,
+                    c=value,
+                    d=Primary_index_name,
+                    e=MainWindow.TableStatus.data.m_row[row][0]
+                )
+                logging.error(SQL_sentence)
+                SqlChange.EX_C(MainWindow.SqlConn, SQL_sentence)
+            except:
+                logging.error("try value type instead of string type")
+                try:
+                    SQL_sentence = "update {a} set {b}={c} where {d}='{e}';".format(
+                        a=MainWindow.TableStatus.TableName,
+                        b=Key_want_change_name,
+                        c=value,
+                        d=Primary_index_name,
+                        e=MainWindow.TableStatus.data.m_row[row][0]
+                    )
+                    logging.error(SQL_sentence)
+                    SqlChange.EX_C(MainWindow.SqlConn, SQL_sentence)
+                except:
+                    logging.error("SQL sentence error")
+                    QMessageBox.information(MainWindow.Qw,'ERROR',
+                        'Can not change due to some errors.',QMessageBox.Yes|QMessageBox.No,QMessageBox.Yes)
+        # Flush window
+        TableSqlAction.TableFlushes(MainWindow)
+
+    @staticmethod
+    def TableFlushes(MainWindow):
+        table_name = MainWindow.TableStatus.TableName
+        if MainWindow.UserStatus.User_mode == "r":
+            if MainWindow.UserStatus.User_mode != "r":
+                logging.error("User mode is changed when you clicked. Failed to load")
+                QMessageBox.information(MainWindow.Qw,'MSG B',
+                            "User mode is changed when you clicked. Failed to load!",QMessageBox.Yes|QMessageBox.No,QMessageBox.Yes)
+            else:
+                if table_name in ["C", "S", "GG", "D"]:
+                    SQL_Sentence = "select * from {a};".format(a=table_name)
+                elif table_name == "G":
+                    _buf_col = "G.GNo,G.CNo,S.SNo,S.SName,S.SKind,S.SPrice,S.SInventory,GS.GSNum"
+                    SQL_Sentence = "select {a} from G,C,GS,S where G.GNo=GS.GNo and GS.SNo=S.SNo and G.CNo=C.CNo;".format(a=_buf_col)
+                data = SqlSearch.SelfDefind_S_direct(MainWindow.SqlConn, SQL_Sentence)
+                description = SqlSearch.Get_Table_description_direct(MainWindow.SqlConn, SQL_Sentence)
+                TableSqlAction.TableViewUpdate(MainWindow, description, data)
+                MainWindow.TableStatus.Update(table_name, data, description)
+        elif MainWindow.UserStatus.User_mode == "C":
+            if MainWindow.UserStatus.User_mode != 'C':
+                logging.error("User mode is changed when you clicked. Failed to load")
+                QMessageBox.information(MainWindow.Qw,'MSG B',
+                            "User mode is changed when you clicked. Failed to load!",QMessageBox.Yes|QMessageBox.No,QMessageBox.Yes)
+            else:
+                if table_name == "C":
+                    SQL_Sentence = "select * from C where CNo='{a}';".format(a=MainWindow.UserStatus.User_info)
+                elif table_name == "G":
+                    _buf_col = "G.GNo,C.CNo,S.SNo,S.SName,S.SKind,S.SPrice,S.SInventory,GS.GSNum"
+                    SQL_Sentence = "select {a} from C,G,GS,S where C.CNo=G.CNo and G.GNo=GS.GNo and GS.SNo=S.SNo and C.CNo='{b}';".format(
+                        a=_buf_col,
+                        b=MainWindow.UserStatus.User_info
+                    )
+                elif table_name == "D":
+                    _buf_col = "D.DNo,D.CNo,D.Dpay,DPay_yn,DS_yn,DM_yn,S.SNo,S.SName,DS.DSNum,S.SKind,S.SPrice,S.SInventory"
+                    SQL_Sentence = "select {a} from D,DS,S where D.CNo='{b}' and D.DNo=DS.DNo and DS.SNo=S.SNo;".format(
+                        a=_buf_col,
+                        b=MainWindow.UserStatus.User_info
+                    )
+                elif table_name == "GG":
+                    SQL_Sentence = "select * from GG;"
+                elif table_name == "S":
+                    SQL_Sentence = "select * from S;"
+                data = SqlSearch.SelfDefind_S_direct(MainWindow.SqlConn, SQL_Sentence)
+                description = SqlSearch.Get_Table_description_direct(MainWindow.SqlConn, SQL_Sentence)
+                TableSqlAction.TableViewUpdate(MainWindow, description, data)
+                MainWindow.TableStatus.Update(table_name, data, description)
+        elif MainWindow.UserStatus.User_mode == "P":
+            if MainWindow.UserStatus.User_mode != 'P':
+                logging.error("User mode is changed when you clicked. Failed to load")
+                QMessageBox.information(MainWindow.Qw,'MSG B',
+                            "User mode is changed when you clicked. Failed to load!",QMessageBox.Yes|QMessageBox.No,QMessageBox.Yes)
+            else:
+                SQL_Sentence = None
+                if table_name == "S":
+                    SQL_Sentence = "select * from S;"
+                elif table_name == "D":
+                    _buf_col_ = "distinct GGD.GGNo,GGD.DNo,D.DNo,S.SName,D.CNo,D.DPay_yn,D.DS_yn,DM_yn,C.CPhone,C.CAddr,C.CName"
+                    SQL_Sentence = "select {a} from D,GGD,S,C,DS,GS,G where GGD.DNo=D.DNo and GGD.GGNo='{b}'and S.SNo=DS.SNo and C.CNo=G.CNo and D.CNo=C.CNo and DS.DNo=D.DNo;".format(
+                        a=_buf_col_,
+                        b=MainWindow.UserStatus.User_info
+                    )
+                elif table_name == "GG":
+                    SQL_Sentence = "select * from GG where GG.GGNo='{a}';".format(a=MainWindow.UserStatus.User_info)
+                if SQL_Sentence is not None:
+                    data = SqlSearch.SelfDefind_S_direct(MainWindow.SqlConn, SQL_Sentence)
+                    description = SqlSearch.Get_Table_description_direct(MainWindow.SqlConn, SQL_Sentence)
+                    TableSqlAction.TableViewUpdate(MainWindow, description, data)
+                    MainWindow.TableStatus.Update(table_name, data, description)
+                else:
+                    logging.info("can't reach")
+                    QMessageBox.information(MainWindow.Qw,'MSG B',
+                            "你不能查看这张表!!!",QMessageBox.Yes|QMessageBox.No,QMessageBox.Yes)
+
+    @staticmethod
     def TableRightMenuContent(MainWindow, qt_point):
         qt_Modleidx = QtWidgets.QTableView.indexAt(MainWindow.tableView,qt_point)
         # print(qt_Modleidx.row(), qt_Modleidx.column())
@@ -115,8 +229,13 @@ class TableSqlAction:
         Can delete All Item from every table. 
         """
         if MainWindow.UserStatus.User_mode == "C":
-            if MainWindow.TableStatus.TableName in ["C", "GG", "D"]:
+            if MainWindow.TableStatus.TableName in ["GG", "D"]:
                 pass
+            elif MainWindow.TableStatus.TableName == "C":
+                MainWindow.actionChange = MainWindow.tableView.contextMenu.addAction(r"修改此项")
+                MainWindow.actionChange.triggered.connect(
+                    lambda: TableSqlAction.TableViewRightClick_Change(MainWindow, qt_Modleidx)
+                )
             elif MainWindow.TableStatus.TableName == "S":
                 MainWindow.actionAdd2G_one = MainWindow.tableView.contextMenu.addAction(r"添加一件到购物车")
                 # TODO add function
@@ -147,6 +266,10 @@ class TableSqlAction:
                 MainWindow.actionDelete_all = MainWindow.tableView.contextMenu.addAction(r"删除多件")
                 #TODO delete function
         elif MainWindow.UserStatus.User_mode == "r":
+            MainWindow.actionChange = MainWindow.tableView.contextMenu.addAction(r"修改此项")
+            MainWindow.actionChange.triggered.connect(
+                lambda: TableSqlAction.TableViewRightClick_Change(MainWindow, qt_Modleidx)
+            )
             MainWindow.actionDelete_one = MainWindow.tableView.contextMenu.addAction(r"删除该行")
             #TODO delete function
 

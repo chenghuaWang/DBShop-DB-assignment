@@ -13,7 +13,7 @@ from PyQt5.QtWidgets import QStyleFactory, QMessageBox, QMenu, QWidget, qApp, QI
 from PyQt5.QtCore import QObject, Qt
 from PyQt5.QtGui import QStandardItemModel, QStandardItem, QCursor
 
-from GUI.API.Sql2Qt_Layer import LoginSqlAction, TreeViewSqlAction, MenuInsertSqlAction
+from GUI.API.Sql2Qt_Layer import LoginSqlAction, TreeViewSqlAction, MenuInsertSqlAction, LineEditSqlAction
 from GUI.API.UserStatus import UserStatus_DS
 from GUI.API.TableSqlAction import TableSqlAction
 from GUI.API.CurrentTableStatus import CurrentTableStatus
@@ -47,8 +47,10 @@ class UI_MainWindow():
         self.centralwidget.setObjectName("centralwidget")
         self.gridLayout = QtWidgets.QGridLayout(self.centralwidget)
         self.gridLayout.setObjectName("gridLayout")
+        # -- Line Edit
         self.lineEdit = QtWidgets.QLineEdit(self.centralwidget)
         self.lineEdit.setObjectName("lineEdit")
+        self.lineEdit.returnPressed.connect(lambda:LineEditSqlAction.main(self))
         self.gridLayout.addWidget(self.lineEdit, 0, 0, 1, 1)
         self.horizontalLayout = QtWidgets.QHBoxLayout()
         self.horizontalLayout.setObjectName("horizontalLayout")
@@ -82,12 +84,17 @@ class UI_MainWindow():
         self.statusbar = QtWidgets.QStatusBar(MainWindow)
         self.statusbar.setObjectName("statusbar")
         MainWindow.setStatusBar(self.statusbar)
+        # -- action
         self.actionQuit = QtWidgets.QAction(MainWindow)
         self.actionQuit.setObjectName("actionQuit")
         self.actionSearch = QtWidgets.QAction(MainWindow)
         self.actionSearch.setObjectName("actionSearch")
         self.actionLogin = QtWidgets.QAction(MainWindow)
         self.actionLogin.setObjectName("actionLogin")
+        self.actionAddCUser = QtWidgets.QAction(MainWindow)
+        self.actionAddCUser.setObjectName("actionAddCUser")
+        self.actionAddPUser = QtWidgets.QAction(MainWindow)
+        self.actionAddPUser.setObjectName("actionAddPUser")
         self.actionSort = QtWidgets.QAction(MainWindow)
         self.actionSort.setObjectName("actionSort")
         self.actionInsert = QtWidgets.QAction(MainWindow)
@@ -96,6 +103,7 @@ class UI_MainWindow():
         self.menu.addAction(self.actionQuit)
         self.menu.addAction(self.actionSearch)
         self.menu_2.addAction(self.actionLogin)
+        self.menu_2.addAction(self.actionAddCUser)
         self.menu_3.addAction(self.actionSort)
         self.menu_3.addAction(self.actionInsert)
         self.menubar.addAction(self.menu.menuAction())
@@ -122,7 +130,7 @@ class UI_MainWindow():
         self.actionSearch.setStatusTip(_translate("MainWindow", "Search in sql or script defined"))
         # -- Sort
         self.actionSort.setText(_translate("MainWindow", "排序"))
-        self.actionLogin.setStatusTip(_translate("MainWindow", "sort in oreder"))
+        self.actionSort.setStatusTip(_translate("MainWindow", "sort in oreder"))
         # -- insert
         self.actionInsert.setText(_translate("MainWindow", "插入"))
         self.actionInsert.setShortcut(_translate("MainWindow", "Ctrl+I"))
@@ -139,6 +147,10 @@ class UI_MainWindow():
         self.actionLogin.setShortcut(_translate("MainWindow", "Ctrl+L"))
         self.actionLogin.setStatusTip(_translate("MainWindow", "Login. User or root-Manager"))
         self.actionLogin.triggered.connect(lambda: self.LoginWindowShow())
+        # -- Add User
+        self.actionAddCUser.setText(_translate("MainWindow", "Add custom User"))
+        self.actionAddCUser.setStatusTip(_translate("MainWindow", "AddUser in C table"))
+        # TODO self.actionAddUser.triggered.connect()
 
     # -- TreeView
     def TreeViewInit(self, MainWindow):
