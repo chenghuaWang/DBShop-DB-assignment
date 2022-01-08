@@ -19,13 +19,21 @@ from GUI.API.TableSqlAction import TableSqlAction
 from GUI.API.CurrentTableStatus import CurrentTableStatus
 from GUI.API.SearchTable_window import SearchTable_Window
 from GUI.API.Inert_window import Insert_Window
+from GUI.API.select_window import Select_Window
+from GUI.API.Sql2Qt_Layer import SelectSqlAction
+from GUI.API.Sql2Qt_Layer import LoginSqlAction_new
+from GUI.API.Sql2Qt_Layer import RegisterSqlAction
+from GUI.API.login_register_window import Login_Register_Window
 
 class UI_MainWindow():
     def __init__(self, MainWindow, SqlConn):
         self.Insert_childWindow = Insert_Window(TableSqlAction, self)
         self.SearchTable_childWindow = SearchTable_Window()
+        self.Select_childWindow = Select_Window(self, TableSqlAction)
+        self.Login_Register_childWindow = Login_Register_Window(self, TableSqlAction, LoginSqlAction)
         self.TableStatus = CurrentTableStatus("default")
         self.UserStatus = UserStatus_DS("default", "default")
+        self.id_pwd = ["default", "default", True, True]
         self.MainWindow = MainWindow
         self.SqlConn = SqlConn
         self.Qw = QWidget()
@@ -129,6 +137,7 @@ class UI_MainWindow():
         self.actionSearch.setText(_translate("MainWindow", "查询"))
         self.actionSearch.setShortcut(_translate("MainWindow", "Ctrl+S"))
         self.actionSearch.setStatusTip(_translate("MainWindow", "Use lambda function to get result"))
+        self.actionSearch.triggered.connect(lambda: SelectSqlAction.main(self))
         # -- Sort
         self.actionSort.setText(_translate("MainWindow", "排序"))
         self.actionSort.setStatusTip(_translate("MainWindow", "sort in oreder"))
@@ -151,10 +160,10 @@ class UI_MainWindow():
         # -- Add User
         self.actionAddCUser.setText(_translate("MainWindow", "Add custom User"))
         self.actionAddCUser.setStatusTip(_translate("MainWindow", "AddUser in C table"))
-        # TODO self.actionAddUser.triggered.connect()
+        self.actionAddCUser.triggered.connect(lambda: RegisterSqlAction.main(self, "C"))
         self.actionAddPUser.setText(_translate("MainWindow", "Add provider User"))
         self.actionAddPUser.setStatusTip(_translate("MainWindow", "AddUser in P table"))
-        # TODO self.actionAddUser.triggered.connect()
+        self.actionAddPUser.triggered.connect(lambda: RegisterSqlAction.main(self, "GG"))
 
     # -- TreeView
     def TreeViewInit(self, MainWindow):
@@ -211,6 +220,8 @@ class UI_MainWindow():
 
     # -- Login Window Action Maker
     def LoginWindowShow(self):
+        LoginSqlAction_new.main(self)
+        """print(self.id_pwd)
         ok_id = ok_pwd = False
         ID, ok_id = QInputDialog.getText(self.Qw, 'ID Input Dialog', 'Enter your ID:')
         if ok_id:
@@ -221,7 +232,7 @@ class UI_MainWindow():
         if ok_id and ok_pwd:
             if ID[0] in ['C', 'P', 'r']:
                 self.UserStatus.Update(ID[0], ID)
-            LoginSqlAction.main(self, ID[0], ID, Pwd)
+            LoginSqlAction.main(self, ID[0], ID, Pwd)"""
     
     def TableRightClick(self):
         TableSqlAction.TableViewRightClickMain(self)

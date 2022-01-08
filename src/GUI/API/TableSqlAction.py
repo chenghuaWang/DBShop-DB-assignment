@@ -22,6 +22,7 @@ from PyQt5.QtGui import QStandardItemModel, QStandardItem, QCursor
 from logic.SqlDelete import SqlDelete
 from logic.SqlSearch import SqlSearch
 from logic.SqlChange import SqlChange
+from logic.SqlInsert import SqlInsert
 
 from GUI.API.SearchTable_window import SearchTable_Window
 

@@ -17,6 +17,7 @@ from PyQt5.QtWidgets import QMessageBox
 
 from logic.SqlSearch import SqlSearch
 from GUI.API.TableSqlAction import TableSqlAction
+from GUI.API.login_register_window import Login_Register_Window
 from core.Phaser import PhaserLoginCfg
 
 class LoginSqlAction:
@@ -289,3 +290,26 @@ class LineEditSqlAction:
                 QMessageBox.information(MainWindow.Qw,'ERROR',
                         "Sql sentence wrong in lineEdit!",QMessageBox.Yes|QMessageBox.No,QMessageBox.Yes)
 
+
+class SelectSqlAction:
+    @staticmethod
+    def main(MainWindow):
+        if MainWindow.TableStatus.TableName in ["S","D","C","GG","G"]:
+            MainWindow.Select_childWindow.updateSelectBar(MainWindow.TableStatus.describe)
+            MainWindow.Select_childWindow.show()
+
+
+class LoginSqlAction_new:
+    @staticmethod
+    def main(MainWindow):
+        MainWindow.Login_Register_childWindow.SetWindowMode("Login")
+        MainWindow.Login_Register_childWindow.SetALLLLTextClear()
+        MainWindow.Login_Register_childWindow.show()
+
+
+class RegisterSqlAction:
+    @staticmethod
+    def main(MainWindow, TableName):
+        MainWindow.Login_Register_childWindow.SetWindowMode("Register")
+        MainWindow.Login_Register_childWindow.SetALLLLTextClear()
+        MainWindow.Login_Register_childWindow.show()
