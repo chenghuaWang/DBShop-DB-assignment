@@ -1,3 +1,8 @@
+"""
+@Author:    chenghua.Wang
+@file:      src/GUI/API/login_register_window.py
+@brief:     Login-register window, use basic login in sql2qt_layer file.
+"""
 import os
 import sys
 import hashlib

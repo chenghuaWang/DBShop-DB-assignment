@@ -16,8 +16,9 @@ PyQt5==5.15.6
 qt_material==2.8.19
 ```
 
-1. 执行 `pip install -r requirements`
-2. 执行 `python main.py`
+1. 执行 `git clone https://github.com/chenghuaWang/DBShop-DB-assignment.git`
+2. 执行 `pip install -r requirements`
+3. 执行 `python src/main.py`
 
 ## 运行界面
 
