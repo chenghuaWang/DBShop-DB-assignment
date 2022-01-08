@@ -105,7 +105,6 @@ class SqlSearch_DS:
     r"""
     input: [tuple]m_row
     Data struct, for the type returned by DB after search cmd.
-    TODO: Tested->false
     """
     def __init__(self, m_row):
         self.m_row = m_row
