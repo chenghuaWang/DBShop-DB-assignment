@@ -15,6 +15,7 @@ from PyQt5.QtWidgets import QMessageBox
 
 from logic.SqlSearch import SqlSearch
 from GUI.API.TableSqlAction import TableSqlAction
+from core.Phaser import PhaserLoginCfg
 
 class LoginSqlAction:
     @staticmethod

@@ -101,10 +101,11 @@ class UI_MainWindow():
         self.actionInsert.setObjectName("actionInsert")
         # -- menu action
         self.menu.addAction(self.actionQuit)
-        self.menu.addAction(self.actionSearch)
         self.menu_2.addAction(self.actionLogin)
         self.menu_2.addAction(self.actionAddCUser)
+        self.menu_2.addAction(self.actionAddPUser)
         self.menu_3.addAction(self.actionSort)
+        self.menu_3.addAction(self.actionSearch)
         self.menu_3.addAction(self.actionInsert)
         self.menubar.addAction(self.menu.menuAction())
         self.menubar.addAction(self.menu_2.menuAction())
@@ -125,9 +126,9 @@ class UI_MainWindow():
         self.actionQuit.setStatusTip(_translate("MainWindow", "Quit this window"))
         self.actionQuit.triggered.connect(qApp.quit)
         # -- Search.
-        self.actionSearch.setText(_translate("MainWindow", "Search"))
+        self.actionSearch.setText(_translate("MainWindow", "查询"))
         self.actionSearch.setShortcut(_translate("MainWindow", "Ctrl+S"))
-        self.actionSearch.setStatusTip(_translate("MainWindow", "Search in sql or script defined"))
+        self.actionSearch.setStatusTip(_translate("MainWindow", "Use lambda function to get result"))
         # -- Sort
         self.actionSort.setText(_translate("MainWindow", "排序"))
         self.actionSort.setStatusTip(_translate("MainWindow", "sort in oreder"))
@@ -150,6 +151,9 @@ class UI_MainWindow():
         # -- Add User
         self.actionAddCUser.setText(_translate("MainWindow", "Add custom User"))
         self.actionAddCUser.setStatusTip(_translate("MainWindow", "AddUser in C table"))
+        # TODO self.actionAddUser.triggered.connect()
+        self.actionAddPUser.setText(_translate("MainWindow", "Add provider User"))
+        self.actionAddPUser.setStatusTip(_translate("MainWindow", "AddUser in P table"))
         # TODO self.actionAddUser.triggered.connect()
 
     # -- TreeView
@@ -215,6 +219,7 @@ class UI_MainWindow():
             else:
                 QMessageBox.information(self.Qw,'Error',"不存在用户{a}".format(a=ID),QMessageBox.Yes|QMessageBox.No,QMessageBox.Yes)
         if ok_id and ok_pwd:
+            # TODO check if pwd and user is ok.
             if ID[0] in ['C', 'P', 'r']:
                 self.UserStatus.Update(ID[0], ID)
             LoginSqlAction.main(self, ID[0], ID)

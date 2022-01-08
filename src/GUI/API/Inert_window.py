@@ -106,6 +106,9 @@ class Insert_Window(QtWidgets.QDialog):
             self.AddItemButton_action()
             StartRow = 1
             if self.MainWindow.TableStatus.TableName == "S":
+                """
+                只有在root, P用户登陆的情况下 S insert enable
+                """
                 for idx in range(StartRow, self.TableData.NumRow_f()):
                     _buf_value_ = "('{a}','{b}','{c}',{d},{e})".format(
                         a=self.TableData.m_row[idx][0],
@@ -120,7 +123,8 @@ class Insert_Window(QtWidgets.QDialog):
                 如果是商户登录，那么商品需要和GGS表挂钩，意味着需要更新GG表
                 """
                 if self.MainWindow.UserStatus.User_mode == "P":
-                    SqlInsert.EX_I("insert into GG VALUES('{a}','{b}')") # 少一张表
+                    SqlInsert.EX_I("insert into GG VALUES('{a}','{b}',)")
+                    SqlInsert.EX_I("insert into GGS VALUES('{a}','{b}')") # 少一张表
             elif self.MainWindow.TableStatus.TableName == "GG":
                 pass
             for item in SQL_Sentence:
