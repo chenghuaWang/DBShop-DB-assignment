@@ -5,6 +5,8 @@
 """
 import os
 import sys
+
+from src.logic.SqlInsert import SqlInsert
 sys.path.append(os.path.split(sys.path[0])[0])
 
 import logging
@@ -41,10 +43,57 @@ class TableSqlAction:
         MainWindow.tableView.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
 
     @staticmethod
-    def TableViewRightClick_deleteOne(MainWindow):
+    def TableViewRightClick_Add2G_one(MainWindow, qt_Modelidx):
+        """
+        This function has already be Checked by menu logic.
+        And it can only be visited by Custom Login.
+        """
+        row = qt_Modelidx.row()
+        col = qt_Modelidx.column()
+        SNo_idx_in_S = MainWindow.TableStatus.describe.index("SNo")
+        _buf_SNo = MainWindow.TableStatus.data.m_row[row][SNo_idx_in_S]
+        # Search GNo.
+        GNo_searched = SqlSearch.SelfDefind_S_direct(
+            MainWindow.SqlConn,
+            "select GNo from G where CNo='{a}'".format(a=MainWindow.UserStatus.User_info)
+        )
+        GNo_searched = GNo_searched.m_row[0][0]
+        SQL_sentence = "insert into GS values('{a}', '{b}', {c});".format(
+            a=_buf_SNo,
+            b=GNo_searched,
+            c=1
+        )
+        SqlInsert.EX_I(MainWindow.SqlConn, SQL_sentence)
+
+    @staticmethod
+    def TableViewRightClick_Add2G_multi(MainWindow, qt_Modelidx):
+        row = qt_Modelidx.row()
+        col = qt_Modelidx.column()
+        SNo_idx_in_S = MainWindow.TableStatus.describe.index("SNo")
+        _buf_SNo = MainWindow.TableStatus.data.m_row[row][SNo_idx_in_S]
+        Num, ok_Num = QInputDialog.getInt(MainWindow.Qw, 'Num Input Dialog', 'Enter Number:')
+        if ok_Num == False or int(Num) <= 0:
+            return
+        # Search GNo.
+        GNo_searched = SqlSearch.SelfDefind_S_direct(
+            MainWindow.SqlConn,
+            "select GNo from G where CNo='{a}'".format(a=MainWindow.UserStatus.User_info)
+        )
+        GNo_searched = GNo_searched.m_row[0][0]
+        SQL_sentence = "insert into GS values('{a}', '{b}', {c});".format(
+            a=_buf_SNo,
+            b=GNo_searched,
+            c=Num
+        )
+        SqlInsert.EX_I(MainWindow.SqlConn, SQL_sentence)
+
+    @staticmethod
+    def TableViewRightClick_deleteOne(MainWindow, ):
         r"""
+        This function has already be Checked by menu logic.
         Delete function for "G"\"D" Table only.
         """
+        
         pass
 
     @staticmethod
@@ -206,6 +255,8 @@ class TableSqlAction:
             b=qt_Modleidx.row(),
             c=qt_Modleidx.column()
         ))
+        if qt_Modleidx.row() == -1 or qt_Modleidx.column() == -1:
+            return
         """
         All Table is "C", "S", "G", "GG", "D"
         Build numerous Action for different Table and User.
@@ -240,9 +291,13 @@ class TableSqlAction:
                 )
             elif MainWindow.TableStatus.TableName == "S":
                 MainWindow.actionAdd2G_one = MainWindow.tableView.contextMenu.addAction(r"添加一件到购物车")
-                # TODO add function
+                MainWindow.actionAdd2G_one.triggered.connect(
+                    lambda: TableSqlAction.TableViewRightClick_Add2G_one(MainWindow, qt_Modleidx)
+                )
                 MainWindow.actionAdd2G_multi = MainWindow.tableView.contextMenu.addAction(r"添加多件到购物车")
-                # TODO add function
+                MainWindow.actionAdd2G_multi.triggered.connect(
+                    lambda: TableSqlAction.TableViewRightClick_Add2G_multi(MainWindow, qt_Modleidx)
+                )
                 MainWindow.actionSearchSupportor = MainWindow.tableView.contextMenu.addAction(r"查找供应商")
                 MainWindow.actionSearchSupportor.triggered.connect(
                     lambda:TableSqlAction.TableViewRightClick_SearchSupportor(MainWindow, qt_Modleidx)

@@ -5,6 +5,8 @@
 """
 import os
 import sys
+import time;
+import calendar;
 sys.path.append(os.path.split(sys.path[0])[0])
 
 import logging
@@ -168,6 +170,11 @@ class Insert_Window(QtWidgets.QDialog):
                     )
                     _buf_sql_ = "insert into "+self.MainWindow.TableStatus.TableName+" VALUES"+_buf_value_
                     SQL_Sentence.append(_buf_sql_)
+                    _buf_sql1_ = "insert into G values('{a}','{b}')".format(
+                        a="G"+str(calendar.timegm(time.gmtime()))[0:8],
+                        b=self.TableData.m_row[idx][0]
+                    ) 
+                    SQL_Sentence.append(_buf_sql1_)
                     for item in SQL_Sentence:
                         SqlInsert.EX_I(self.MainWindow.SqlConn,item)
             elif self.MainWindow.TableStatus.TableName == "G":
