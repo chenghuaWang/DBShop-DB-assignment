@@ -58,12 +58,27 @@ class TableSqlAction:
             "select GNo from G where CNo='{a}'".format(a=MainWindow.UserStatus.User_info)
         )
         GNo_searched = GNo_searched.m_row[0][0]
-        SQL_sentence = "insert into GS values('{a}', '{b}', {c});".format(
-            a=_buf_SNo,
-            b=GNo_searched,
-            c=1
+        # Get whether This item is exists.
+        SQL_sentence = "select GSNum from GS where GNo='{a}' and SNo='{b}';".format(
+            a=GNo_searched,
+            b=_buf_SNo,    
         )
-        SqlInsert.EX_I(MainWindow.SqlConn, SQL_sentence)
+        Num_seqrched = SqlSearch.SelfDefind_S_direct(MainWindow.SqlConn, SQL_sentence)
+        # debug->print(Num_seqrched.NumRow_f(), Num_seqrched.m_row)
+        if Num_seqrched.NumRow_f() == 0:
+            SQL_sentence = "insert into GS values('{a}', '{b}', {c});".format(
+                a=_buf_SNo,
+                b=GNo_searched,
+                c=1
+            )
+            SqlInsert.EX_I(MainWindow.SqlConn, SQL_sentence)
+        else:
+            SQL_sentence = "update GS set GSNum={a} where GNo='{b}' and SNo='{c}';".format(
+                a=Num_seqrched.m_row[0][0] + 1,
+                b=GNo_searched,
+                c=_buf_SNo
+            )
+            SqlChange.EX_C(MainWindow.SqlConn, SQL_sentence)
 
     @staticmethod
     def TableViewRightClick_Add2G_multi(MainWindow, qt_Modelidx):
@@ -80,29 +95,132 @@ class TableSqlAction:
             "select GNo from G where CNo='{a}'".format(a=MainWindow.UserStatus.User_info)
         )
         GNo_searched = GNo_searched.m_row[0][0]
-        SQL_sentence = "insert into GS values('{a}', '{b}', {c});".format(
-            a=_buf_SNo,
-            b=GNo_searched,
-            c=Num
+        # Get whether This item is exists.
+        SQL_sentence = "select GSNum from GS where GNo='{a}' and SNo='{b}';".format(
+            a=GNo_searched,
+            b=_buf_SNo,    
         )
-        SqlInsert.EX_I(MainWindow.SqlConn, SQL_sentence)
+        Num_seqrched = SqlSearch.SelfDefind_S_direct(MainWindow.SqlConn, SQL_sentence)
+        # debug->print(Num_seqrched.NumRow_f(), Num_seqrched.m_row)
+        if Num_seqrched.NumRow_f() == 0:
+            SQL_sentence = "insert into GS values('{a}', '{b}', {c});".format(
+                a=_buf_SNo,
+                b=GNo_searched,
+                c=Num
+            )
+            SqlInsert.EX_I(MainWindow.SqlConn, SQL_sentence)
+        else:
+            SQL_sentence = "update GS set GSNum={a} where GNo='{b}' and SNo='{c}';".format(
+                a=Num_seqrched.m_row[0][0] + Num,
+                b=GNo_searched,
+                c=_buf_SNo
+            )
+            SqlChange.EX_C(MainWindow.SqlConn, SQL_sentence)
 
     @staticmethod
-    def TableViewRightClick_deleteOne(MainWindow, ):
+    def TableViewRightClick_deleteOne(MainWindow, qt_Modelidx, Primary_Key_Name):
         r"""
         This function has already be Checked by menu logic.
         Delete function for "G"\"D" Table only.
         """
-        
-        pass
+        row = qt_Modelidx.row()
+        col = qt_Modelidx.column()
+        if MainWindow.TableStatus.TableName == "G" and MainWindow.UserStatus.User_mode!="r":
+            SNo_idx_in_S = MainWindow.TableStatus.describe.index("SNo")
+            _buf_SNo = MainWindow.TableStatus.data.m_row[row][SNo_idx_in_S]
+            # Search GNo.
+            GNo_searched = SqlSearch.SelfDefind_S_direct(
+                MainWindow.SqlConn,
+                "select GNo from G where CNo='{a}'".format(a=MainWindow.UserStatus.User_info)
+            )
+            GNo_searched = GNo_searched.m_row[0][0]
+            # Get whether This item is exists.
+            SQL_sentence = "select GSNum from GS where GNo='{a}' and SNo='{b}';".format(
+                a=GNo_searched,
+                b=_buf_SNo,    
+            )
+            Num_seqrched = SqlSearch.SelfDefind_S_direct(MainWindow.SqlConn, SQL_sentence)
+            # debug->print(Num_seqrched.NumRow_f(), Num_seqrched.m_row)
+            if Num_seqrched.m_row[0][0] == 1:
+                SQL_sentence = "delete from GS where SNo='{a}' and GNo='{b}'".format(
+                    a=_buf_SNo,
+                    b=GNo_searched
+                )
+                SqlDelete.EX_D(MainWindow.SqlConn, SQL_sentence)
+            else:
+                SQL_sentence = "update GS set GSNum={a} where GNo='{b}' and SNo='{c}';".format(
+                    a=Num_seqrched.m_row[0][0] - 1,
+                    b=GNo_searched,
+                    c=_buf_SNo
+                )
+                SqlChange.EX_C(MainWindow.SqlConn, SQL_sentence)
+        elif MainWindow.TableStatus.TableName == "D" and MainWindow.UserStatus.User_mode!="r":
+            SNo_idx_in_S = MainWindow.TableStatus.describe.index("SNo")
+            _buf_SNo = MainWindow.TableStatus.data.m_row[row][SNo_idx_in_S]
+            # Search GNo.
+            DNo_searched = SqlSearch.SelfDefind_S_direct(
+                MainWindow.SqlConn,
+                "select DNo from D where CNo='{a}'".format(a=MainWindow.UserStatus.User_info)
+            )
+            DNo_searched = DNo_searched.m_row[0][0]
+            # Get whether This item is exists.
+            SQL_sentence = "select DSNum from DS where DNo='{a}' and SNo='{b}';".format(
+                a=DNo_searched,
+                b=_buf_SNo,    
+            )
+            Num_seqrched = SqlSearch.SelfDefind_S_direct(MainWindow.SqlConn, SQL_sentence)
+            # debug->print(Num_seqrched.NumRow_f(), Num_seqrched.m_row)
+            if Num_seqrched.m_row[0][0] == 1:
+                SQL_sentence = "delete from DS where SNo='{a}' and DNo='{b}'".format(
+                    a=_buf_SNo,
+                    b=DNo_searched
+                )
+                SqlDelete.EX_D(MainWindow.SqlConn, SQL_sentence)
+            else:
+                SQL_sentence = "update DS set DSNum={a} where DNo='{b}' and SNo='{c}';".format(
+                    a=Num_seqrched.m_row[0][0] - 1,
+                    b=DNo_searched,
+                    c=_buf_SNo
+                )
+                SqlChange.EX_C(MainWindow.SqlConn, SQL_sentence)
+        else:
+            Table_in_sql = MainWindow.TableStatus.TableName
+            Primary_key_idx_in_table = MainWindow.TableStatus.describe.index(Primary_Key_Name)
+            Primary_key_value = MainWindow.TableStatus.data.m_row[row][Primary_key_idx_in_table]
+            # check num is 1 or not, delete if num is 1, else update
+            SQL_sentence = "select "
+            # execute delete one logic
+            SQL_sentence = "delete from {a} where {b}='{c}'".format(
+                a=Table_in_sql,
+                b=Primary_Key_Name,
+                c=Primary_key_value
+            )
+            SqlDelete.EX_D(MainWindow.SqlConn, SQL_sentence)
+        TableSqlAction.TableFlushes(MainWindow)
 
     @staticmethod
     def TableViewRightClick_deleteMulti(MainWindow):
         pass
 
     @staticmethod
-    def TableViewRightClick_deleteAll(MainWindow):
-        pass
+    def TableViewRightClick_deleteAll(MainWindow, qt_Modelidx, Primary_Key_Name):
+        row = qt_Modelidx.row()
+        col = qt_Modelidx.column()
+        if MainWindow.TableStatus.TableName == "G":
+            Table_in_sql = "GS"
+        elif MainWindow.TableStatus.TableName == "D":
+            Table_in_sql = "DS"
+        else:
+            Table_in_sql = MainWindow.TableStatus.TableName
+        Primary_key_idx_in_table = MainWindow.TableStatus.describe.index(Primary_Key_Name)
+        Primary_key_value = MainWindow.TableStatus.data.m_row[row][Primary_key_idx_in_table]
+        SQL_sentence = "delete from {a} where {b}='{c}'".format(
+            a=Table_in_sql,
+            b=Primary_Key_Name,
+            c=Primary_key_value
+        )
+        SqlDelete.EX_D(MainWindow.SqlConn, SQL_sentence)
+        TableSqlAction.TableFlushes(MainWindow)
 
     @staticmethod
     def TableViewRightClick_insert(MainWindow):
@@ -282,7 +400,7 @@ class TableSqlAction:
         Can delete All Item from every table. 
         """
         if MainWindow.UserStatus.User_mode == "C":
-            if MainWindow.TableStatus.TableName in ["GG", "D"]:
+            if MainWindow.TableStatus.TableName in ["GG"]:
                 pass
             elif MainWindow.TableStatus.TableName == "C":
                 MainWindow.actionChange = MainWindow.tableView.contextMenu.addAction(r"修改此项")
@@ -304,7 +422,9 @@ class TableSqlAction:
                 )
             elif MainWindow.TableStatus.TableName == "G":
                 MainWindow.actionDelete_one  = MainWindow.tableView.contextMenu.addAction(r"删除一件")
-                # TODO delete function
+                MainWindow.actionDelete_one.triggered.connect(
+                    lambda: TableSqlAction.TableViewRightClick_deleteOne(MainWindow, qt_Modleidx, "SNo")
+                )
                 MainWindow.actionDelete_all = MainWindow.tableView.contextMenu.addAction(r"删除多件")
                 # TODO delete function
                 MainWindow.actionSearchSupportor = MainWindow.tableView.contextMenu.addAction(r"查找供应商")
@@ -313,6 +433,14 @@ class TableSqlAction:
                 )
                 MainWindow.actionPush2D = MainWindow.tableView.contextMenu.addAction(r"推送购物车内容到订单")
                 # Add function
+            elif MainWindow.TableStatus.TableName == "D":
+                MainWindow.actionDelete_one  = MainWindow.tableView.contextMenu.addAction(r"删除一件")
+                MainWindow.actionDelete_one.triggered.connect(
+                    lambda: TableSqlAction.TableViewRightClick_deleteOne(MainWindow, qt_Modleidx, "SNo")
+                )
+                MainWindow.actionDelete_all = MainWindow.tableView.contextMenu.addAction(r"删除多件")
+                # TODO delete function
+
         elif MainWindow.UserStatus.User_mode == "P":
             if MainWindow.TableStatus.TableName in ["C", "S", "D"]:
                 pass
@@ -323,14 +451,17 @@ class TableSqlAction:
                 MainWindow.actionDelete_all = MainWindow.tableView.contextMenu.addAction(r"删除多件")
                 #TODO delete function
         elif MainWindow.UserStatus.User_mode == "r":
-            MainWindow.actionChange = MainWindow.tableView.contextMenu.addAction(r"修改此项")
-            MainWindow.actionChange.triggered.connect(
-                lambda: TableSqlAction.TableViewRightClick_Change(MainWindow, qt_Modleidx)
-            )
-            MainWindow.actionDelete_one = MainWindow.tableView.contextMenu.addAction(r"删除该行")
-            #TODO delete function
+            if MainWindow.TableStatus.TableName in ["C", "GG", "S"]:
+                MainWindow.actionChange = MainWindow.tableView.contextMenu.addAction(r"修改此项")
+                MainWindow.actionChange.triggered.connect(
+                    lambda: TableSqlAction.TableViewRightClick_Change(MainWindow, qt_Modleidx)
+                )
+            if MainWindow.TableStatus.TableName in ["GG", "C", "S"]:
+                MainWindow.actionDelete_one = MainWindow.tableView.contextMenu.addAction(r"删除该行")
+                MainWindow.actionDelete_one.triggered.connect(
+                    lambda: TableSqlAction.TableViewRightClick_deleteOne(MainWindow, qt_Modleidx, MainWindow.TableStatus.TableName + "No")
+                )
 
-        
         # MainWindow.actionDelete = MainWindow.tableView.contextMenu.addAction(r"删除一项")
         # MainWindow.actionDelete.triggered.connect(lambda:TableSqlAction.TableViewRightClick_deleteOne(MainWindow))
         MainWindow.tableView.contextMenu.popup(QCursor.pos())  # Position of menu
