@@ -4,7 +4,10 @@
 @brief:     Table Action Logic. Independent.
 """
 import os
+from re import M
 import sys
+import time
+import calendar
 
 from src.logic.SqlInsert import SqlInsert
 sys.path.append(os.path.split(sys.path[0])[0])
@@ -42,7 +45,39 @@ class TableSqlAction:
     def TableViewRightClick_Push2D(MainWindow, qt_Modelidx):
         row = qt_Modelidx.row()
         col = qt_Modelidx.column()
-        
+        # Get All item in G's index and info
+        G_items = MainWindow.TableStatus.data.m_row
+        G_items_discribe = MainWindow.TableStatus.describe
+        # Get All info and insert into D,DS Table
+        SPrice = 0
+        DNo_buf = "D" + str(calendar.timegm(time.gmtime()))[0:8]
+        for idx in range(0, len(G_items)):
+            SPrice += (G_items[idx][G_items_discribe.index("SPrice")]) * (G_items[idx][G_items_discribe.index("GSNum")])
+        D_value = "'{DNo}', '{CNo}', {DPay}, {DPay_yn}, {DS_yn}, {DM_yn}".format(
+            DNo=DNo_buf,
+            CNo=MainWindow.UserStatus.User_info,
+            DPay=SPrice,
+            DPay_yn='1',
+            DS_yn='0',
+            DM_yn='0.0'
+        )
+        SQL_sentence = "insert into D values({a})".format(a=D_value)
+        SqlInsert.EX_I(MainWindow.SqlConn, SQL_sentence)
+        for idx in range(0, len(G_items)):
+            # insert to DS
+            SQL_sentence = "insert into DS values('{SNo}','{DNo}',{DSNum});".format(
+                SNo=G_items[idx][G_items_discribe.index("SNo")],
+                DNo=DNo_buf,
+                DSNum=G_items[idx][G_items_discribe.index("GSNum")]
+            )
+            SqlInsert.EX_I(MainWindow.SqlConn, SQL_sentence)
+        # Delete all item in G
+        SQL_sentence = "delete from G where GNo='{a}';".format(
+            a=G_items[0][G_items_discribe.index("GNo")]
+        )
+        SqlDelete.EX_D(MainWindow.SqlConn, SQL_sentence)
+
+        TableSqlAction.TableFlushes(MainWindow)
 
     @staticmethod
     def TableViewRightClick_Add2G_one(MainWindow, qt_Modelidx):
@@ -59,6 +94,16 @@ class TableSqlAction:
             MainWindow.SqlConn,
             "select GNo from G where CNo='{a}'".format(a=MainWindow.UserStatus.User_info)
         )
+        if GNo_searched.NumRow_f() == 0:
+            _buf_sql1_ = "insert into G values('{a}','{b}')".format(
+                a="G"+str(calendar.timegm(time.gmtime()))[0:8],
+                b=MainWindow.UserStatus.User_info
+            )
+            SqlInsert.EX_I(MainWindow.SqlConn, _buf_sql1_)
+            GNo_searched = SqlSearch.SelfDefind_S_direct(
+                MainWindow.SqlConn,
+                "select GNo from G where CNo='{a}'".format(a=MainWindow.UserStatus.User_info)
+            )
         GNo_searched = GNo_searched.m_row[0][0]
         # Get whether This item is exists.
         SQL_sentence = "select GSNum from GS where GNo='{a}' and SNo='{b}';".format(
@@ -96,6 +141,16 @@ class TableSqlAction:
             MainWindow.SqlConn,
             "select GNo from G where CNo='{a}'".format(a=MainWindow.UserStatus.User_info)
         )
+        if GNo_searched.NumRow_f() == 0:
+            _buf_sql1_ = "insert into G values('{a}','{b}')".format(
+                a="G"+str(calendar.timegm(time.gmtime()))[0:8],
+                b=MainWindow.UserStatus.User_info
+            )
+            SqlInsert.EX_I(MainWindow.SqlConn, _buf_sql1_)
+            GNo_searched = SqlSearch.SelfDefind_S_direct(
+                MainWindow.SqlConn,
+                "select GNo from G where CNo='{a}'".format(a=MainWindow.UserStatus.User_info)
+            )
         GNo_searched = GNo_searched.m_row[0][0]
         # Get whether This item is exists.
         SQL_sentence = "select GSNum from GS where GNo='{a}' and SNo='{b}';".format(
@@ -159,17 +214,14 @@ class TableSqlAction:
         elif MainWindow.TableStatus.TableName == "D" and MainWindow.UserStatus.User_mode=="C":
             SNo_idx_in_S = MainWindow.TableStatus.describe.index("SNo")
             _buf_SNo = MainWindow.TableStatus.data.m_row[row][SNo_idx_in_S]
-            # Search GNo.
-            DNo_searched = SqlSearch.SelfDefind_S_direct(
-                MainWindow.SqlConn,
-                "select DNo from D where CNo='{a}'".format(a=MainWindow.UserStatus.User_info)
-            )
-            DNo_searched = DNo_searched.m_row[0][0]
+            # Search DNo.
+            DNo_searched = MainWindow.TableStatus.data.m_row[row][MainWindow.TableStatus.describe.index("DNo")]
             # Get whether This item is exists.
             SQL_sentence = "select DSNum from DS where DNo='{a}' and SNo='{b}';".format(
                 a=DNo_searched,
                 b=_buf_SNo,    
             )
+            print(SQL_sentence)
             Num_seqrched = SqlSearch.SelfDefind_S_direct(MainWindow.SqlConn, SQL_sentence)
             # debug->print(Num_seqrched.NumRow_f(), Num_seqrched.m_row)
             if Num_seqrched.m_row[0][0] == 1:
@@ -239,12 +291,8 @@ class TableSqlAction:
         elif MainWindow.TableStatus.TableName == "D" and MainWindow.UserStatus.User_mode=="C":
             SNo_idx_in_S = MainWindow.TableStatus.describe.index("SNo")
             _buf_SNo = MainWindow.TableStatus.data.m_row[row][SNo_idx_in_S]
-            # Search GNo.
-            DNo_searched = SqlSearch.SelfDefind_S_direct(
-                MainWindow.SqlConn,
-                "select DNo from D where CNo='{a}'".format(a=MainWindow.UserStatus.User_info)
-            )
-            DNo_searched = DNo_searched.m_row[0][0]
+            # Search DNo.
+            DNo_searched = MainWindow.TableStatus.data.m_row[row][MainWindow.TableStatus.describe.index("DNo")]
             # Get whether This item is exists.
             SQL_sentence = "select DSNum from DS where DNo='{a}' and SNo='{b}';".format(
                 a=DNo_searched,
@@ -509,10 +557,12 @@ class TableSqlAction:
                 )
                 MainWindow.actionSearchSupportor = MainWindow.tableView.contextMenu.addAction(r"查找供应商")
                 MainWindow.actionSearchSupportor.triggered.connect(
-                    lambda:TableSqlAction.TableViewRightClick_SearchSupportor(MainWindow, qt_Modleidx)
+                    lambda: TableSqlAction.TableViewRightClick_SearchSupportor(MainWindow, qt_Modleidx)
                 )
                 MainWindow.actionPush2D = MainWindow.tableView.contextMenu.addAction(r"推送购物车内容到订单")
-                # TODO Add function
+                MainWindow.actionPush2D.triggered.connect(
+                    lambda: TableSqlAction.TableViewRightClick_Push2D(MainWindow, qt_Modleidx)
+                )
             elif MainWindow.TableStatus.TableName == "D":
                 MainWindow.actionDelete_one  = MainWindow.tableView.contextMenu.addAction(r"删除一件")
                 MainWindow.actionDelete_one.triggered.connect(
