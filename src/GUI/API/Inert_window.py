@@ -134,11 +134,47 @@ class Insert_Window(QtWidgets.QDialog):
                         logging.info(item)
                         SqlInsert.EX_I(self.MainWindow.SqlConn,item)
             elif self.MainWindow.TableStatus.TableName == "GG":
+                for idx in range(StartRow, self.TableData.NumRow_f()):
+                    _buf_value_ = "('{a}','{b}','{c}')".format(
+                        a=self.TableData.m_row[idx][0],
+                        b=self.TableData.m_row[idx][1],
+                        c=self.TableData.m_row[idx][2],
+                    )
+                    _buf_sql_ = "insert into "+self.MainWindow.TableStatus.TableName+" VALUES"+_buf_value_
+                    SQL_Sentence.append(_buf_sql_)
+                    for item in SQL_Sentence:
+                        SqlInsert.EX_I(self.MainWindow.SqlConn,item)
+            elif self.MainWindow.TableStatus.TableName == "D":
+                for idx in range(StartRow, self.TableData.NumRow_f()):
+                    _buf_value_ = "('{a}','{b}',{c},{d},{e},{f})".format(
+                        a=self.TableData.m_row[idx][0],
+                        b=self.TableData.m_row[idx][1],
+                        c=self.TableData.m_row[idx][2],
+                        d=self.TableData.m_row[idx][3],
+                        e=self.TableData.m_row[idx][4],
+                        f=self.TableData.m_row[idx][5],
+                    )
+                    _buf_sql_ = "insert into "+self.MainWindow.TableStatus.TableName+" VALUES"+_buf_value_
+                    SQL_Sentence.append(_buf_sql_)
+                    for item in SQL_Sentence:
+                        SqlInsert.EX_I(self.MainWindow.SqlConn,item)
+            elif self.MainWindow.TableStatus.TableName == "C":
+                for idx in range(StartRow, self.TableData.NumRow_f()):
+                    _buf_value_ = "('{a}','{b}','{c}','{d}')".format(
+                        a=self.TableData.m_row[idx][0],
+                        b=self.TableData.m_row[idx][1],
+                        c=self.TableData.m_row[idx][2],
+                        d=self.TableData.m_row[idx][3],
+                    )
+                    _buf_sql_ = "insert into "+self.MainWindow.TableStatus.TableName+" VALUES"+_buf_value_
+                    SQL_Sentence.append(_buf_sql_)
+                    for item in SQL_Sentence:
+                        SqlInsert.EX_I(self.MainWindow.SqlConn,item)
+            elif self.MainWindow.TableStatus.TableName == "G":
                 pass
             self.func_cls.TableFlushes(self.MainWindow)
             self.close()
         
-
     def UpdateTableData(self, Data, HeaderLabel):
         if Data.NumRow_f() == 0:
             QMessageBox.information(self.Qw,'Search Failed',

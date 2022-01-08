@@ -5,11 +5,13 @@
 """
 import os
 import sys
+import logging
+import hashlib
 
 from src.core.SqlMan import SqlMan
 from src.logic.SqlChange import SqlChange
 sys.path.append(os.path.split(sys.path[0])[0])
-import logging
+
 
 from PyQt5.QtWidgets import QMessageBox
 
@@ -19,7 +21,7 @@ from core.Phaser import PhaserLoginCfg
 
 class LoginSqlAction:
     @staticmethod
-    def main(MainWindow, UserType, ID):
+    def main(MainWindow, UserType, ID, Pwd):
         """
         input:  [string] UserType
                 [string] Entity_name
@@ -27,24 +29,29 @@ class LoginSqlAction:
                 [MainWindow-class] MainWindow
         All logic of LoginAction reflect to Table
         """
-        if UserType == 'C':
-            SQL_Sentence = "select * from C where CNo='{a}'".format(a=ID)
-            data = SqlSearch.SelfDefind_S_direct(MainWindow.SqlConn, SQL_Sentence)
-            description = SqlSearch.Get_Table_description_direct(MainWindow.SqlConn, SQL_Sentence)
-            TableSqlAction.TableViewUpdate(MainWindow, description, data)
-            MainWindow.TableStatus.Update("C", data, description)
-        elif UserType == 'P':
-            SQL_Sentence = "select * from GG where GGNo='{a}';".format(a=ID)
-            data = SqlSearch.SelfDefind_S_direct(MainWindow.SqlConn, SQL_Sentence)
-            description = SqlSearch.Get_Table_description_direct(MainWindow.SqlConn, SQL_Sentence)
-            TableSqlAction.TableViewUpdate(MainWindow, description, data)
-            MainWindow.TableStatus.Update("GG", data, description)
-        elif UserType == 'r':
-            SQL_Sentence = "select * from C;"
-            data = SqlSearch.SelfDefind_S_direct(MainWindow.SqlConn, SQL_Sentence)
-            description = SqlSearch.Get_Table_description_direct(MainWindow.SqlConn, SQL_Sentence)
-            TableSqlAction.TableViewUpdate(MainWindow, description, data)
-            MainWindow.TableStatus.Update("C", data, description)
+        if LoginSqlAction.ComparePwd(MainWindow, UserType, ID, Pwd):
+            if UserType == 'C':
+                SQL_Sentence = "select * from C where CNo='{a}'".format(a=ID)
+                data = SqlSearch.SelfDefind_S_direct(MainWindow.SqlConn, SQL_Sentence)
+                description = SqlSearch.Get_Table_description_direct(MainWindow.SqlConn, SQL_Sentence)
+                TableSqlAction.TableViewUpdate(MainWindow, description, data)
+                MainWindow.TableStatus.Update("C", data, description)
+            elif UserType == 'P':
+                SQL_Sentence = "select * from GG where GGNo='{a}';".format(a=ID)
+                data = SqlSearch.SelfDefind_S_direct(MainWindow.SqlConn, SQL_Sentence)
+                description = SqlSearch.Get_Table_description_direct(MainWindow.SqlConn, SQL_Sentence)
+                TableSqlAction.TableViewUpdate(MainWindow, description, data)
+                MainWindow.TableStatus.Update("GG", data, description)
+            elif UserType == 'r':
+                SQL_Sentence = "select * from C;"
+                data = SqlSearch.SelfDefind_S_direct(MainWindow.SqlConn, SQL_Sentence)
+                description = SqlSearch.Get_Table_description_direct(MainWindow.SqlConn, SQL_Sentence)
+                TableSqlAction.TableViewUpdate(MainWindow, description, data)
+                MainWindow.TableStatus.Update("C", data, description)
+        else:
+            logging.error("User {a} Not exits, or Pwd wrong".format(a=ID))
+            QMessageBox.information(MainWindow.Qw,'Error',
+                        "User {a} Not exits, or Pwd wrong".format(a=ID),QMessageBox.Yes|QMessageBox.No,QMessageBox.Yes)
 
     @staticmethod
     def LoginWindow_TableViewChange(MainWindow, ID, TableName):
@@ -61,6 +68,43 @@ class LoginSqlAction:
         __data__ = SqlSearch.SelfDefined_S(SqlConn, "*", Table_name, "where CNo='{a}'".format(a=Entity_name))
         __describtion__ = SqlSearch.Get_Table_description(SqlConn, "*", Table_name, "where CNo='{a}'".format(a=Entity_name))
         return __data__, __describtion__
+
+    @staticmethod
+    def ComparePwd(MainWindow, UserType, UserID, pwd):
+        if UserType == "r":
+            PL = PhaserLoginCfg()
+            ori_id = PL.GetManager(0)["ManagerName"]
+            ori_pwd = PL.GetManager(0)["Password"]
+            if UserID == ori_id and hashlib.md5(pwd.encode("utf8")).hexdigest() == ori_pwd:
+                return True
+            else:
+                return False
+        elif UserType == "C":
+            sql = " "
+            ori_pwd = None
+            sql = "select CMNo from CM where CNo='{a}';".format(a=UserID)
+            ori_pwd = SqlSearch.SelfDefind_S_direct(MainWindow.SqlConn, sql)
+            if ori_pwd == None or ori_pwd.NumRow_f() == 0:
+                return False
+            else:
+                ori_pwd = ori_pwd.m_row[0][0][0:-1]
+                if hashlib.md5(pwd.encode("utf8")).hexdigest() == ori_pwd:
+                    return True
+                else:
+                    return False
+        elif UserType == "P":
+            sql = " "
+            ori_pwd = None
+            sql = "select GGMNo from GGM where GGNo='{a}';".format(a=UserID)
+            ori_pwd = SqlSearch.SelfDefind_S_direct(MainWindow.SqlConn, sql)
+            if ori_pwd == None or ori_pwd.NumRow_f() == 0:
+                return False
+            else:
+                ori_pwd = ori_pwd.m_row[0][0][0:-1]
+                if hashlib.md5(pwd.encode("utf8")).hexdigest() == ori_pwd:
+                    return True
+                else:
+                    return False
 
 
 class TreeViewSqlAction:

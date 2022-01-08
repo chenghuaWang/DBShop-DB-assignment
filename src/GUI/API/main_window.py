@@ -214,15 +214,14 @@ class UI_MainWindow():
         ok_id = ok_pwd = False
         ID, ok_id = QInputDialog.getText(self.Qw, 'ID Input Dialog', 'Enter your ID:')
         if ok_id:
-            if ID[0] in ['C', 'P', 'r']:
+            if ID[0] in ['C', 'P', 'r'] and ID != "":
                 Pwd, ok_pwd = QInputDialog.getText(self.Qw, 'pwd Input Dialog', 'Enter your password:')
             else:
                 QMessageBox.information(self.Qw,'Error',"不存在用户{a}".format(a=ID),QMessageBox.Yes|QMessageBox.No,QMessageBox.Yes)
         if ok_id and ok_pwd:
-            # TODO check if pwd and user is ok.
             if ID[0] in ['C', 'P', 'r']:
                 self.UserStatus.Update(ID[0], ID)
-            LoginSqlAction.main(self, ID[0], ID)
+            LoginSqlAction.main(self, ID[0], ID, Pwd)
     
     def TableRightClick(self):
         TableSqlAction.TableViewRightClickMain(self)

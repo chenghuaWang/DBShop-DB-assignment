@@ -73,7 +73,9 @@ class TableSqlAction:
         col = qt_Modelidx.column()
         SNo_idx_in_S = MainWindow.TableStatus.describe.index("SNo")
         _buf_SNo = MainWindow.TableStatus.data.m_row[row][SNo_idx_in_S]
-        SQL_Sentence = "select * from S,GG,GGS where S.SNo='{a}' and GGS.GGNo=GG.GGNo and GGS.SNo=S.SNo;".format(
+        _buf_need = "GG.GGNo, GG.GGName, GG.GGAddr, S.SNo, S.SName"
+        SQL_Sentence = "select {need} from S,GG,GGS where S.SNo='{a}' and GGS.GGNo=GG.GGNo and GGS.SNo=S.SNo;".format(
+            need = _buf_need,
             a=_buf_SNo
         )
         _data_ = SqlSearch.SelfDefind_S_direct(MainWindow.SqlConn,SQL_Sentence)
@@ -257,9 +259,9 @@ class TableSqlAction:
                 MainWindow.actionPush2D = MainWindow.tableView.contextMenu.addAction(r"推送购物车内容到订单")
                 # Add function
         elif MainWindow.UserStatus.User_mode == "P":
-            if MainWindow.TableStatus.TableName in ["C", "GG", "D"]:
+            if MainWindow.TableStatus.TableName in ["C", "S", "D"]:
                 pass
-            elif MainWindow.TableStatus.TableName == "S":
+            elif MainWindow.TableStatus.TableName == "GG":
                 # first we should change into S table belong to P first.
                 MainWindow.actionDelete_one = MainWindow.tableView.contextMenu.addAction(r"删除一件")
                 #TODO delete function
